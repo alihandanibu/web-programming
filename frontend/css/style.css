@@ -1,0 +1,88 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 76px;
+    /* Use same background as hero so there is no white gap under fixed navbar */
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-attachment: fixed;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 120px 0;
+    text-align: center;
+}
+
+/* Remove any navbar bottom line/shadow that can show as a white strip */
+.navbar {
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+}
+
+.section-padding {
+    padding: 80px 0;
+}
+
+.card-hover {
+    transition: transform 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+}
+
+.btn-primary {
+    background-color: var(--secondary-color);
+    border: none;
+}
+
+.nav-link.active {
+    color: var(--secondary-color) !important;
+}
+
+.profile-placeholder {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+}
+
+.skill-track {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    height: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .skill-fill {
+    background-color: #007bff; /* plava */
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;             /* pun roditelja, vidljivost kontrolira transform */
+    transform-origin: left center;
+    transform: scaleX(0);    /* start collapsed */
+    transition: transform 1.2s ease-in-out;
+    border-radius: 10px;
+    will-change: transform;
+    z-index: 2;              /* iznad tracka i eventualnih pseudo elemenata */
+    pointer-events: none;
+  }
+
+  /* opcionalno: lagano shadow / inner to make it visible on light backgrounds */
+  .skill-fill::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: rgba(255,255,255,0.12);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    pointer-events: none;
+  }

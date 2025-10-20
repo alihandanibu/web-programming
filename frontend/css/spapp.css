@@ -1,0 +1,10 @@
+/* SPApp CSS */
+#spapp { 
+    min-height: 400px; 
+}
+[data-load] { 
+    display: none; 
+}
+.nav-link.active { 
+    font-weight: bold; 
+}
