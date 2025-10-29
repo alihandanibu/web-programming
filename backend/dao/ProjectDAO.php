@@ -6,12 +6,11 @@ class ProjectDAO extends BaseDAO {
         parent::__construct('projects');
     }
 
+    // Svi CRUD operacije su nasljeđene iz BaseDAO
+
+    // Dodatna specifična metoda - koristi BaseDAO helper
     public function findByUserId($user_id) {
-        $query = "SELECT * FROM " . $this->table . " WHERE user_id = :user_id ORDER BY created_at DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->findByColumn('user_id', $user_id, 'created_at DESC');
     }
 }
 ?>

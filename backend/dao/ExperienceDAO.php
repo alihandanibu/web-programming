@@ -6,12 +6,12 @@ class ExperienceDAO extends BaseDAO {
         parent::__construct('experiences');
     }
 
+    // Jednostavna metoda - koristi BaseDAO helper
     public function findByUserId($user_id) {
-        $query = "SELECT * FROM " . $this->table . " WHERE user_id = :user_id ORDER BY start_date DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->findByColumn('user_id', $user_id, 'start_date DESC');
     }
+    
+    // Svi CRUD operacije su već u BaseDAO:
+    // - create(), findAll(), findById(), update(), delete()
 }
 ?>

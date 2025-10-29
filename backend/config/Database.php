@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = '127.0.0.1';
-    private $port = '3307'; // Vaš MySQL port je 3307
+    private $port = '3307'; 
     private $db_name = 'portfolio';
     private $username = 'root';
     private $password = '';

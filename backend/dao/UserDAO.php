@@ -6,12 +6,17 @@ class UserDAO extends BaseDAO {
         parent::__construct('users');
     }
 
+    // Svi CRUD operacije su nasljeđene iz BaseDAO:
+    // - create() za POST
+    // - findAll() za GET all  
+    // - findById() za GET by ID
+    // - update() za PUT/PATCH
+    // - delete() za DELETE
+
+    // Dodatna specifična metoda
     public function findByEmail($email) {
-        $query = "SELECT * FROM " . $this->table . " WHERE email = :email LIMIT 1";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $this->findByColumn('email', $email, 'id DESC');
+        return $result ? $result[0] : null;
     }
 }
 ?>

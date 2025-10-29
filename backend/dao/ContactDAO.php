@@ -6,12 +6,9 @@ class ContactDAO extends BaseDAO {
         parent::__construct('contacts');
     }
 
+    // KORISTI BASEDAO METODU UMESTO CUSTOM QUERY-JA
     public function findByStatus($status) {
-        $query = "SELECT * FROM " . $this->table . " WHERE status = :status ORDER BY created_at DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':status', $status);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->findByColumn('status', $status, 'created_at DESC');
     }
 }
 ?>
