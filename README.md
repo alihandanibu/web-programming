@@ -1,4 +1,4 @@
-## Handan Portfolio — Milestone 1
+# Handan Portfolio — Milestone 1
 
 This repository contains the frontend for my portfolio project for Milestone 1. It is a responsive single-page application built with Bootstrap and vanilla JavaScript. Pages live in `frontend/views/` and are loaded dynamically by `frontend/js/spapp.js`. To run locally, place the project folder in c:/xampp/htdocs/portfolio-handan, start Apache in XAMPP, and open http://localhost/portfolio-handan/frontend/index.html. Key files and folders are `frontend/index.html`, `frontend/views/`, `frontend/css/`, `frontend/js/` and `frontend/assets/images/`. The ERD diagram is at frontend/assets/images/erd-diagram.jpg.
 ![erd-diagram](frontend/erddiagramjpg.jpg)
