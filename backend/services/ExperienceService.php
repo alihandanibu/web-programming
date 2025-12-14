@@ -11,14 +11,14 @@ class ExperienceService {
     }
 
     public function addExperience($userId, $data) {
-        if (empty($data['title']) || empty($data['company'])) {
-            return ['success' => false, 'message' => 'Title and company are required'];
+        if (empty($data['company']) || empty($data['position'])) {
+            return ['success' => false, 'message' => 'Company and position are required'];
         }
 
         $experienceData = [
             'user_id' => $userId,
-            'title' => $data['title'],
             'company' => $data['company'],
+            'position' => $data['position'],
             'start_date' => $data['start_date'] ?? null,
             'end_date' => $data['end_date'] ?? null,
             'description' => $data['description'] ?? null

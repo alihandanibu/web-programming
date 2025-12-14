@@ -1,0 +1,87 @@
+<section id="dashboard" class="section-padding">
+    <div class="container">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 id="welcomeMessage">Welcome back!</h2>
+                <p class="text-muted">Personal Portfolio Dashboard</p>
+            </div>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user"></i> Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="fw-bold">Name:</label>
+                            <p id="userName" class="mb-0">Loading...</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Email:</label>
+                            <p id="userEmail" class="mb-0">Loading...</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Role:</label>
+                            <p id="userRole" class="mb-0"><span class="badge bg-secondary">Loading...</span></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Login Status:</label>
+                            <p class="mb-0"><span class="badge bg-success">Authenticated</span></p>
+                        </div>
+                        <div>
+                            <label class="fw-bold">Session Time:</label>
+                            <p id="sessionTime" class="mb-0">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role-Based Section -->
+            <div class="col-md-6">
+                <!-- Admin Tools (visible only for admin) -->
+                <div id="adminSection" class="card shadow-sm mb-3" style="display: none;">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="fas fa-tools"></i> Admin Tools</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>You have administrator privileges.</p>
+                        <a href="#admin" class="btn btn-danger w-100">Go to Admin Panel</a>
+                    </div>
+                </div>
+
+                <!-- Standard User Section -->
+                <div id="userSection" class="card shadow-sm mb-3" style="display: none;">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-circle"></i> User Access</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Standard user access granted.</p>
+                        <p class="text-muted small mb-0">Manage your portfolio content below.</p>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-cog"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="#projects" class="btn btn-outline-primary w-100 mb-2">View Projects</a>
+                        <a href="#skills" class="btn btn-outline-primary w-100 mb-2">View Skills</a>
+                        <a href="#contact" class="btn btn-outline-primary w-100 mb-2">Contact</a>
+                        <button id="logoutBtn" class="btn btn-outline-danger w-100">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="dashboardError" class="alert alert-danger mt-3" style="display: none;">
+            <p class="mb-0" id="errorMessage"></p>
+        </div>
+    </div>
+</section>

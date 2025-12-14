@@ -11,9 +11,7 @@ abstract class BaseDAO {
         $this->conn = $database->getConnection();
     }
 
-    // ========== CRUD OPERATIONS ==========
-
-    // CREATE (POST) - Create operacija
+    // Create new record
     public function create($data) {
         $columns = implode(", ", array_keys($data));
         $placeholders = ":" . implode(", :", array_keys($data));
@@ -31,7 +29,7 @@ abstract class BaseDAO {
         return false;
     }
 
-    // READ (GET) - Get all operacija
+    // Get all records
     public function findAll() {
         $query = "SELECT * FROM " . $this->table . " ORDER BY id DESC";
         $stmt = $this->conn->prepare($query);
@@ -39,7 +37,7 @@ abstract class BaseDAO {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // READ (GET) - Get by ID operacija
+    // Get record by ID
     public function findById($id) {
         $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
@@ -48,7 +46,7 @@ abstract class BaseDAO {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // UPDATE (PUT/PATCH) - Update operacija
+    // Update record
     public function update($id, $data) {
         $setClause = [];
         foreach ($data as $key => $value) {
@@ -67,7 +65,7 @@ abstract class BaseDAO {
         return $stmt->execute();
     }
 
-    // DELETE (DELETE) - Delete operacija
+    // Delete record
     public function delete($id) {
         $query = "DELETE FROM " . $this->table . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
@@ -75,9 +73,7 @@ abstract class BaseDAO {
         return $stmt->execute();
     }
 
-    // ========== HELPER METHODS ==========
-
-    // Pronalazi sve zapise po bilo kojoj koloni
+    // Find records by column value
     public function findByColumn($column, $value, $orderBy = 'id DESC') {
         $query = "SELECT * FROM " . $this->table . " WHERE " . $column . " = :value ORDER BY " . $orderBy;
         $stmt = $this->conn->prepare($query);
@@ -86,7 +82,7 @@ abstract class BaseDAO {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Broji zapise po koloni
+    // Count records by column value
     public function countByColumn($column, $value) {
         $query = "SELECT COUNT(*) as count FROM " . $this->table . " WHERE " . $column . " = :value";
         $stmt = $this->conn->prepare($query);

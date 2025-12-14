@@ -1,0 +1,544 @@
+// Dashboard initialization
+document.addEventListener('DOMContentLoaded', function () {
+    // Check if we're on the dashboard view
+    if (window.location.hash !== '#dashboard') {
+        return;
+    }
+
+    // Check authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.hash = '#login';
+        return;
+    }
+
+    // Load dashboard data
+    loadDashboard();
+
+    // Setup logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.hash = '#home';
+        });
+    }
+});
+
+// Listen for hash changes to reload dashboard
+window.addEventListener('hashchange', function () {
+    if (window.location.hash === '#dashboard') {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.hash = '#login';
+            return;
+        }
+        loadDashboard();
+    }
+});
+
+function loadDashboard() {
+    // Get current session time
+    const now = new Date();
+    const sessionTimeEl = document.getElementById('sessionTime');
+    if (sessionTimeEl) {
+        sessionTimeEl.textContent = now.toLocaleString();
+    }
+
+    // Load user data from backend
+    apiGetCurrentUser()
+        .then(response => {
+            if (response.success && response.user) {
+                const user = response.user;
+
+                // Update welcome message
+                const welcomeMsg = document.getElementById('welcomeMessage');
+                if (welcomeMsg) {
+                    welcomeMsg.textContent = `Welcome back, ${user.email.split('@')[0]}!`;
+                }
+
+                // Update user info
+                const userNameEl = document.getElementById('userName');
+                if (userNameEl) {
+                    userNameEl.textContent = user.email.split('@')[0];
+                }
+
+                const userEmailEl = document.getElementById('userEmail');
+                if (userEmailEl) {
+                    userEmailEl.textContent = user.email;
+                }
+
+                const userRoleEl = document.getElementById('userRole');
+                if (userRoleEl) {
+                    const roleClass = user.role === 'admin' ? 'bg-danger' : 'bg-info';
+                    userRoleEl.innerHTML = `<span class="badge ${roleClass}">${user.role.toUpperCase()}</span>`;
+                }
+
+                // Show role-based section
+                const adminSection = document.getElementById('adminSection');
+                const userSection = document.getElementById('userSection');
+
+                if (user.role === 'admin') {
+                    if (adminSection) adminSection.style.display = 'block';
+                    if (userSection) userSection.style.display = 'none';
+                } else {
+                    if (adminSection) adminSection.style.display = 'none';
+                    if (userSection) userSection.style.display = 'block';
+                }
+
+                // Hide error
+                const errorDiv = document.getElementById('dashboardError');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            } else {
+                showDashboardError('Failed to load user data');
+            }
+        })
+        .catch(error => {
+            console.error('Dashboard error:', error);
+            showDashboardError(error.message || 'Failed to connect to backend');
+        });
+}
+
+function showDashboardError(message) {
+    const errorDiv = document.getElementById('dashboardError');
+    const errorMsg = document.getElementById('errorMessage');
+
+    if (errorDiv && errorMsg) {
+        errorMsg.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+}
+    const section = e.target.closest('[data-section]').dataset.section;
+
+    // Update active button
+    document.querySelectorAll('[data-section]').forEach(btn => btn.classList.remove('active'));
+    e.target.closest('[data-section]').classList.add('active');
+
+    // Hide all sections
+    document.querySelectorAll('.section-content').forEach(el => el.style.display = 'none');
+
+    // Show selected section
+    document.getElementById(section + 'Section').style.display = 'block';
+
+    // Load data if not already loaded
+    if (section === 'projects' && !window.projectsLoaded) {
+        loadProjects();
+    } else if (section === 'experiences' && !window.experiencesLoaded) {
+        loadExperiences();
+    } else if (section === 'skills' && !window.skillsLoaded) {
+        loadSkills();
+    }
+}
+
+// ==================== PROJECTS ====================
+
+async function loadProjects() {
+    try {
+        const user = getUser();
+        const result = await apiCall(`/users/${user.id}/projects`);
+
+        const projectsList = document.getElementById('projectsList');
+
+        if (!result.projects || result.projects.length === 0) {
+            projectsList.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-folder2-open"></i>
+                    <p>Još niste dodali projekte</p>
+                    <p class="small">Kliknite "Novi Projekt" da biste počeli</p>
+                </div>
+            `;
+            return;
+        }
+
+        projectsList.innerHTML = result.projects.map(project => `
+            <div class="item-card">
+                <h5>${project.title}</h5>
+                ${project.description ? `<p><strong>Opis:</strong> ${project.description}</p>` : ''}
+                ${project.technologies ? `<p><strong>Tehnologije:</strong> ${project.technologies}</p>` : ''}
+                ${project.link ? `<p><strong>Link:</strong> <a href="${project.link}" target="_blank">${project.link}</a></p>` : ''}
+                <p class="small text-muted">
+                    ${project.start_date ? formatDate(project.start_date) : ''} 
+                    ${project.end_date ? '- ' + formatDate(project.end_date) : ''}
+                </p>
+                <div class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editProject(${project.id})">
+                        <i class="bi bi-pencil"></i> Uredi
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProject(${project.id})">
+                        <i class="bi bi-trash"></i> Obriši
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        window.projectsLoaded = true;
+    } catch (error) {
+        console.error('Error loading projects:', error);
+    }
+}
+
+async function saveProject(e) {
+    e.preventDefault();
+
+    const user = getUser();
+    const projectId = document.getElementById('projectId').value;
+
+    const data = {
+        title: document.getElementById('projectTitle').value,
+        description: document.getElementById('projectDesc').value,
+        technologies: document.getElementById('projectTech').value,
+        link: document.getElementById('projectLink').value,
+        start_date: document.getElementById('projectStart').value,
+        end_date: document.getElementById('projectEnd').value
+    };
+
+    try {
+        let result;
+        if (projectId) {
+            // Update
+            result = await apiCall(`/users/${user.id}/projects/${projectId}`, 'PUT', data);
+        } else {
+            // Create
+            result = await apiCall(`/users/${user.id}/projects`, 'POST', data);
+        }
+
+        showAlert(result.message || 'Projekat sačuvan!', 'success');
+
+        // Close modal and reload
+        bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
+        window.projectsLoaded = false;
+        await loadProjects();
+    } catch (error) {
+        console.error('Error saving project:', error);
+    }
+}
+
+function editProject(projectId) {
+    // Find the project data
+    const user = getUser();
+    apiCall(`/users/${user.id}/projects`).then(result => {
+        const project = result.projects.find(p => p.id === projectId);
+        if (project) {
+            document.getElementById('projectId').value = project.id;
+            document.getElementById('projectTitle').value = project.title;
+            document.getElementById('projectDesc').value = project.description || '';
+            document.getElementById('projectTech').value = project.technologies || '';
+            document.getElementById('projectLink').value = project.link || '';
+            document.getElementById('projectStart').value = project.start_date ? project.start_date.split(' ')[0] : '';
+            document.getElementById('projectEnd').value = project.end_date ? project.end_date.split(' ')[0] : '';
+            document.getElementById('projectModalTitle').textContent = 'Uredi Projekat';
+
+            new bootstrap.Modal(document.getElementById('addProjectModal')).show();
+        }
+    });
+}
+
+async function deleteProject(projectId) {
+    if (!confirm('Sigurno želite obrisati ovaj projekat?')) return;
+
+    try {
+        const user = getUser();
+        const result = await apiCall(`/users/${user.id}/projects/${projectId}`, 'DELETE');
+        showAlert(result.message || 'Projekat obrisan!', 'success');
+        window.projectsLoaded = false;
+        await loadProjects();
+    } catch (error) {
+        console.error('Error deleting project:', error);
+    }
+}
+
+function clearProjectForm() {
+    document.getElementById('projectForm').reset();
+    document.getElementById('projectId').value = '';
+    document.getElementById('projectModalTitle').textContent = 'Dodaj Novi Projekt';
+}
+
+// ==================== EXPERIENCES ====================
+
+async function loadExperiences() {
+    try {
+        const user = getUser();
+        const result = await apiCall(`/users/${user.id}/experiences`);
+
+        const experiencesList = document.getElementById('experiencesList');
+
+        if (!result.experiences || result.experiences.length === 0) {
+            experiencesList.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-briefcase"></i>
+                    <p>Još niste dodali iskustva</p>
+                    <p class="small">Kliknite "Novo Iskustvo" da biste počeli</p>
+                </div>
+            `;
+            return;
+        }
+
+        experiencesList.innerHTML = result.experiences.map(exp => `
+            <div class="item-card">
+                <h5>${exp.position || 'Pozicija'} - ${exp.company || 'Kompanija'}</h5>
+                ${exp.description ? `<p><strong>Opis:</strong> ${exp.description}</p>` : ''}
+                <p class="small text-muted">
+                    ${exp.start_date ? formatDate(exp.start_date) : ''} 
+                    ${exp.end_date ? '- ' + formatDate(exp.end_date) : '- Trenutno'}
+                </p>
+                <div class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editExperience(${exp.id})">
+                        <i class="bi bi-pencil"></i> Uredi
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteExperience(${exp.id})">
+                        <i class="bi bi-trash"></i> Obriši
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        window.experiencesLoaded = true;
+    } catch (error) {
+        console.error('Error loading experiences:', error);
+    }
+}
+
+async function saveExperience(e) {
+    e.preventDefault();
+
+    const user = getUser();
+    const experienceId = document.getElementById('experienceId').value;
+
+    const data = {
+        company: document.getElementById('experienceCompany').value,
+        position: document.getElementById('experienceRole').value,
+        description: document.getElementById('experienceDesc').value,
+        start_date: document.getElementById('experienceStart').value,
+        end_date: document.getElementById('experienceEnd').value
+    };
+
+    try {
+        let result;
+        if (experienceId) {
+            result = await apiCall(`/users/${user.id}/experiences/${experienceId}`, 'PUT', data);
+        } else {
+            result = await apiCall(`/users/${user.id}/experiences`, 'POST', data);
+        }
+
+        showAlert(result.message || 'Iskustvo sačuvano!', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('addExperienceModal')).hide();
+        window.experiencesLoaded = false;
+        await loadExperiences();
+    } catch (error) {
+        console.error('Error saving experience:', error);
+    }
+}
+
+function editExperience(experienceId) {
+    const user = getUser();
+    apiCall(`/users/${user.id}/experiences`).then(result => {
+        const exp = result.experiences.find(e => e.id === experienceId);
+        if (exp) {
+            document.getElementById('experienceId').value = exp.id;
+            document.getElementById('experienceCompany').value = exp.company || '';
+            document.getElementById('experienceRole').value = exp.position || '';
+            document.getElementById('experienceDesc').value = exp.description || '';
+            document.getElementById('experienceStart').value = exp.start_date ? exp.start_date.split(' ')[0] : '';
+            document.getElementById('experienceEnd').value = exp.end_date ? exp.end_date.split(' ')[0] : '';
+            document.getElementById('experienceModalTitle').textContent = 'Uredi Iskustvo';
+
+            new bootstrap.Modal(document.getElementById('addExperienceModal')).show();
+        }
+    });
+}
+
+async function deleteExperience(experienceId) {
+    if (!confirm('Sigurno želite obrisati ovo iskustvo?')) return;
+
+    try {
+        const user = getUser();
+        const result = await apiCall(`/users/${user.id}/experiences/${experienceId}`, 'DELETE');
+        showAlert(result.message || 'Iskustvo obrisano!', 'success');
+        window.experiencesLoaded = false;
+        await loadExperiences();
+    } catch (error) {
+        console.error('Error deleting experience:', error);
+    }
+}
+
+function clearExperienceForm() {
+    document.getElementById('experienceForm').reset();
+    document.getElementById('experienceId').value = '';
+    document.getElementById('experienceModalTitle').textContent = 'Dodaj Novo Iskustvo';
+}
+
+// ==================== SKILLS ====================
+
+async function loadSkills() {
+    try {
+        const user = getUser();
+        const result = await apiCall(`/users/${user.id}/skills`);
+
+        const skillsList = document.getElementById('skillsList');
+
+        if (!result.skills || result.skills.length === 0) {
+            skillsList.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-lightning"></i>
+                    <p>Još niste dodali veštine</p>
+                    <p class="small">Kliknite "Nova Veština" da biste počeli</p>
+                </div>
+            `;
+            return;
+        }
+
+        skillsList.innerHTML = result.skills.map(skill => {
+            const pct = getProficiencyPercent(skill.proficiency || skill.level);
+            const label = getProficiencyLabel(skill.proficiency || skill.level);
+            const color = getProficiencyColor(skill.proficiency || skill.level);
+            return `
+            <div class="skill-row">
+                <div class="skill-name">${skill.name}</div>
+                <div class="skill-bar"><span style="width:${pct}%; background:${color}"></span></div>
+                <div class="skill-level">${label}</div>
+                <div class="action-buttons ms-2">
+                    <button class="btn btn-warning btn-sm" onclick="editSkill(${skill.id})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSkill(${skill.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+
+        window.skillsLoaded = true;
+    } catch (error) {
+        console.error('Error loading skills:', error);
+    }
+}
+
+function getProficiencyPercent(level) {
+    const map = {
+        'beginner': 25,
+        'intermediate': 50,
+        'advanced': 75,
+        'expert': 95
+    };
+    return map[(level || '').toLowerCase()] ?? 0;
+}
+
+function getProficiencyColor(level) {
+    const map = {
+        'beginner': '#ffc107',
+        'intermediate': '#17a2b8',
+        'advanced': '#28a745',
+        'expert': '#4c6ef5'
+    };
+    return map[(level || '').toLowerCase()] ?? '#6c757d';
+}
+
+function getProficiencyLabel(level) {
+    const map = {
+        'beginner': 'Početak',
+        'intermediate': 'Srednje',
+        'advanced': 'Napredno',
+        'expert': 'Ekspert'
+    };
+    const key = (level || '').toLowerCase();
+    return map[key] || level || '';
+}
+
+async function saveSkill(e) {
+    e.preventDefault();
+
+    const user = getUser();
+    const skillId = document.getElementById('skillId').value;
+
+    const data = {
+        name: document.getElementById('skillName').value,
+        proficiency: document.getElementById('skillLevel').value
+    };
+
+    try {
+        let result;
+        if (skillId) {
+            result = await apiCall(`/users/${user.id}/skills/${skillId}`, 'PUT', data);
+        } else {
+            result = await apiCall(`/users/${user.id}/skills`, 'POST', data);
+        }
+
+        showAlert(result.message || 'Veština sačuvana!', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('addSkillModal')).hide();
+        window.skillsLoaded = false;
+        await loadSkills();
+    } catch (error) {
+        console.error('Error saving skill:', error);
+    }
+}
+
+function editSkill(skillId) {
+    const user = getUser();
+    apiCall(`/users/${user.id}/skills`).then(result => {
+        const skill = result.skills.find(s => s.id === skillId);
+        if (skill) {
+            document.getElementById('skillId').value = skill.id;
+            document.getElementById('skillName').value = skill.name || '';
+            document.getElementById('skillLevel').value = (skill.proficiency || skill.level) || '';
+            document.getElementById('skillModalTitle').textContent = 'Uredi Veštinu';
+
+            new bootstrap.Modal(document.getElementById('addSkillModal')).show();
+        }
+    });
+}
+
+async function deleteSkill(skillId) {
+    if (!confirm('Sigurno želite obrisati ovu veštinu?')) return;
+
+    try {
+        const user = getUser();
+        const result = await apiCall(`/users/${user.id}/skills/${skillId}`, 'DELETE');
+        showAlert(result.message || 'Veština obrisana!', 'success');
+        window.skillsLoaded = false;
+        await loadSkills();
+    } catch (error) {
+        console.error('Error deleting skill:', error);
+    }
+}
+
+function clearSkillForm() {
+    document.getElementById('skillForm').reset();
+    document.getElementById('skillId').value = '';
+    document.getElementById('skillModalTitle').textContent = 'Dodaj Novu Veštinu';
+}
+
+// ==================== PROFILE ====================
+
+async function saveProfile(e) {
+    e.preventDefault();
+
+    const user = getUser();
+
+    const data = {
+        name: document.getElementById('profileNameInput').value,
+        bio: document.getElementById('profileBio').value,
+        location: document.getElementById('profileLocation').value
+    };
+
+    try {
+        const result = await apiCall(`/users/${user.id}`, 'PUT', data);
+
+        // Update localStorage
+        user.name = data.name;
+        user.bio = data.bio;
+        user.location = data.location;
+        localStorage.setItem('user', JSON.stringify(user));
+
+        showAlert(result.message || 'Profil ažuriran!', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+
+        // Update display
+        document.getElementById('profileName').textContent = data.name;
+        document.getElementById('profileLocation').textContent = data.location;
+    } catch (error) {
+        console.error('Error saving profile:', error);
+    }
+}

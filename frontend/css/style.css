@@ -1,88 +1,155 @@
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
+    --brand-prim: #4c6ef5;
+    --brand-sec: #748ffc;
+    --text: #222;
+    --muted: #6c757d;
+    --bg: #f7f7f9;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding-top: 76px;
-    /* Use same background as hero so there is no white gap under fixed navbar */
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    background-attachment: fixed;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .hero-section {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    padding: 120px 0;
+    background: linear-gradient(135deg, var(--brand-prim), var(--brand-sec));
+    color: #fff;
+    padding: 100px 0;
     text-align: center;
 }
 
-/* Remove any navbar bottom line/shadow that can show as a white strip */
 .navbar {
     border-bottom: 0 !important;
     box-shadow: none !important;
 }
 
 .section-padding {
-    padding: 80px 0;
+    padding: 60px 0;
 }
 
-.card-hover {
-    transition: transform 0.3s ease;
-}
-
-.card-hover:hover {
-    transform: translateY(-5px);
+.card {
+    border: none;
+    box-shadow: none;
+    background: transparent;
 }
 
 .btn-primary {
-    background-color: var(--secondary-color);
-    border: none;
+    background: var(--brand-prim);
+    border-color: var(--brand-prim);
+}
+
+.btn-primary:hover {
+    background: #3b5bdb;
+    border-color: #3b5bdb;
 }
 
 .nav-link.active {
-    color: var(--secondary-color) !important;
+    color: var(--brand-prim) !important;
 }
 
 .profile-placeholder {
-    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
 }
 
-.skill-track {
-    background-color: #e9ecef;
+/* Projects grid */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.project-item {
+    border: 1px solid #e9ecef;
+    background: #fff;
     border-radius: 10px;
-    height: 14px;
+    padding: 16px;
+    transition: box-shadow .2s ease, transform .2s ease;
+}
+
+.project-item:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .06);
+    transform: translateY(-3px);
+}
+
+.project-item h5 {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+
+.project-meta {
+    font-size: .9rem;
+    color: var(--muted);
+}
+
+.project-links a {
+    color: var(--brand-prim);
+    text-decoration: none;
+}
+
+.project-links a:hover {
+    text-decoration: underline;
+}
+
+/* Skills progress lines */
+.skill-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 10px 0;
+}
+
+.skill-name {
+    flex: 0 0 160px;
+    font-weight: 600;
+}
+
+.skill-bar {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 6px;
     overflow: hidden;
-    position: relative;
-  }
+}
 
-  .skill-fill {
-    background-color: #007bff; /* plava */
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 100%;             /* pun roditelja, vidljivost kontrolira transform */
-    transform-origin: left center;
-    transform: scaleX(0);    /* start collapsed */
-    transition: transform 1.2s ease-in-out;
-    border-radius: 10px;
-    will-change: transform;
-    z-index: 2;              /* iznad tracka i eventualnih pseudo elemenata */
-    pointer-events: none;
-  }
+.skill-bar>span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--brand-prim);
+    transition: width .6s ease;
+}
 
-  /* opcionalno: lagano shadow / inner to make it visible on light backgrounds */
-  .skill-fill::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 8px;
-    background: rgba(255,255,255,0.12);
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    pointer-events: none;
-  }
+.skill-level {
+    flex: 0 0 90px;
+    text-align: right;
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+/* Forms minimal */
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+.badge {
+    border-radius: 6px;
+}
+
+/* Contact layout tidy */
+.contact-wrap {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 24px;
+}
+
+.contact-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 18px;
+}

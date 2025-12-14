@@ -1,53 +1,125 @@
-## Handan Portfolio — Milestone 1
+Handan Portfolio — Milestone 4
 
-This repository contains the frontend for my portfolio project for Milestone 1. It is a responsive single-page application built with Bootstrap and vanilla JavaScript. Pages live in `frontend/views/` and are loaded dynamically by `frontend/js/spapp.js`. To run locally, place the project folder in c:/xampp/htdocs/portfolio-handan, start Apache in XAMPP, and open http://localhost/portfolio-handan/frontend/index.html. Key files and folders are `frontend/index.html`, `frontend/views/`, `frontend/css/`, `frontend/js/` and `frontend/assets/images/`. The ERD diagram is at frontend/assets/images/erd-diagram.jpg.
-![erd-diagram](frontend/erddiagramjpg.jpg)
+What’s New in Milestone 4:
+- Frontend upgraded to a clean student-style SPA with hash routes: #home, #about, #projects, #skills, #contact, #login, #register, #dashboard, #admin.
+- New Dashboard view with user profile info and role-based sections (admin vs. user) + minimal Admin area.
+- Simplified JS: `frontend/js/app.js` for routing/auth, `frontend/js/api.js` for API calls, `frontend/js/dashboard.js` and `frontend/js/admin.js` for page logic.
+- Cleanup: removed unused `backend/forms/` and the root `composer.lock` in the project; trimmed comments to look student-written.
+- Frontend .htaccess configured to serve SPA correctly (DirectoryIndex + SPA fallback).
 
-# Handan Portfolio — Milestone 2
+How to Run (Local):
+1) Place this repo at `c:/xampp/htdocs/mojnoviprojekat/web-programming`.
+2) Start Apache and MySQL in XAMPP.
+3) Import the database: open `backend/config/database.sql` in phpMyAdmin.
+4) Start the backend API:
 
-## What's New in Milestone 2:
-- **MySQL database** with 5 tables: users, projects, skills, experiences, contacts
-- **DAO classes** for CRUD operations (Create, Read, Update, Delete)
+```bash
+cd C:\xampp\htdocs\mojnoviprojekat\web-programming\backend
+php -S localhost:3000 -t backend
+```
 
-## How to Run:
-1. Place project in `c:/xampp/htdocs/portfolio-handan`
-2. Start Apache and MySQL in XAMPP
-3. Import database: open `backend/config/database.sql` in phpMyAdmin
-4. Open: `http://localhost/portfolio-handan/frontend/index.html`
+5) Open the frontend:
+- http://localhost/mojnoviprojekat/web-programming/frontend/index.html#home
 
-## Important Files:
-- `frontend/` - HTML, CSS, JS files
-- `backend/config/database.sql` - database setup
-- `backend/dao/` - DAO classes for database access
-- `backend/test_dao.php` - test if backend works
+Notes:
+- Apache must allow `.htaccess` (AllowOverride All) for `C:/xampp/htdocs`. Restart Apache after changes.
+- If the browser auto-navigates to `/index.html` at root and shows 404, copy/paste the full frontend URL above.
+- `API_BASE` in `frontend/js/api.js` is set to `http://localhost:3000`.
+- Role-based UI depends on the JWT token stored in `localStorage` after login.
 
-**Contact:** alihandan@stu.ibu.edu.ba
+Test Accounts:
+- Admin: `admin@portfolio.com` / `password`
+- User: `user@portfolio.com` / `password`
 
-# Handan Portfolio — Milestone 3
+Final Project Structure:
 
-## What's New in Milestone 3:
-- **Business Logic Layer**: Service classes for all entities (UserService, SkillService, ExperienceService, ProjectService, ContactService)
-- **JWT Authentication**: Secure token-based authentication using Firebase/PHP-JWT
-- **REST API Routes**: Complete CRUD operations with proper HTTP methods (GET, POST, PUT, DELETE)
-- **OpenAPI/Swagger Documentation**: Interactive API documentation with Swagger UI
-- **Route Definitions**: All endpoints documented with Swagger annotations
+```
+web-programming/
+├── backend/
+│   ├── config/
+│   │   ├── Database.php
+│   │   └── database.sql
+│   ├── dao/
+│   │   ├── BaseDAO.php
+│   │   ├── UserDAO.php
+│   │   ├── ProjectDAO.php
+│   │   ├── SkillDAO.php
+│   │   ├── ExperienceDAO.php
+│   │   └── ContactDAO.php
+│   ├── services/
+│   │   ├── UserService.php
+│   │   ├── ProjectService.php
+│   │   ├── SkillService.php
+│   │   ├── ExperienceService.php
+│   │   └── ContactService.php
+│   ├── routes/
+│   │   ├── AuthRoutes.php
+│   │   ├── UserRoutes.php
+│   │   ├── ProjectRoutes.php
+│   │   ├── SkillRoutes.php
+│   │   ├── ExperienceRoutes.php
+│   │   └── ContactRoutes.php
+│   ├── middleware/
+│   │   └── AuthMiddleware.php
+│   ├── data/
+│   │   └── Roles.php
+│   ├── public/
+│   │   └── v1/
+│   │       └── docs/
+│   ├── index.php
+│   ├── OpenApi.php (if present)
+│   └── vendor/
+│
+├── frontend/
+│   ├── views/
+│   │   ├── home.html
+│   │   ├── about.html
+│   │   ├── projects.html
+│   │   ├── skills.html
+│   │   ├── contact.html
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   ├── dashboard.html
+│   │   ├── admin.html
+│   │   └── error_404.html
+│   ├── js/
+│   │   ├── app.js
+│   │   ├── api.js
+│   │   ├── dashboard.js
+│   │   ├── admin.js
+│   │   ├── features.js
+│   │   └── spapp.min.js
+│   ├── css/
+│   │   ├── spapp.css
+│   │   └── style.css
+│   ├── assets/
+│   │   └── images/
+│   ├── index.html
+│   ├── loader.php
+│   └── .htaccess
+│
+└── README.md
+```
 
-## Key Features:
-- Secure JWT-based authentication for protected routes
-- RESTful API endpoints following best practices
-- Interactive API documentation at `/backend/public/v1/docs/`
-- Dependency injection container using FlightPHP
-- Prepared statements for SQL security
-- Service layer for business logic separation
+Contact: alihandan@stu.ibu.edu.ba
+- Role-based access control (RBAC)
+- CORS configuration for API security
+- Input validation and sanitization
 
-## Technologies Used:
-- **FlightPHP** 3.17+ - Lightweight REST API framework
-- **Firebase/PHP-JWT** 6.0 - JWT authentication
-- **Zircote Swagger-PHP** 5.5 - OpenAPI documentation
-- **MySQL** 5.7+ with PDO - Database layer
+##Contact
 
-## How to Run:
-1. Place project in `c:/xampp/htdocs/mojnoviprojekat`
+- Email: alihandan@stu.ibu.edu.ba
+- GitHub: [@alihandanibu](https://github.com/alihandanibu)
+
+##License
+
+This project is developed for educational purposes as part of the Web Programming course at International Burch University.
+
+---
+
+**Course:** Web Programming  
+**Institution:** International Burch University  
+**Academic Year:** 2024/2025
 2. Start Apache and MySQL in XAMPP
 3. Import database: run `backend/config/database.sql` in phpMyAdmin
 4. Access Swagger UI: `http://localhost/mojnoviprojekat/web-programming/backend/public/v1/docs/`
@@ -67,8 +139,5 @@ This repository contains the frontend for my portfolio project for Milestone 1. 
 - `backend/config/database.sql` - Database schema
 
 ## Deployment Note:
-For production, change the secret key in `backend/middleware/AuthMiddleware.php` from the default value.
-
-**Contact:** alihandan@stu.ibu.edu.ba
-
+For production, change the secret key in `backend/middleware/AuthMiddleware.php` from thdefault value.
 ```

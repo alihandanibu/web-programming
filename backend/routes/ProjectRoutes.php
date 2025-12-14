@@ -1,9 +1,44 @@
 <?php
 
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Get(
+ *   path="/users/{userId}/projects",
+ *   summary="Lista projekata za korisnika",
+ *   tags={"Projects"},
+ *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *   @OA\Response(response=200, description="OK")
+ * )
+ * @OA\Post(
+ *   path="/users/{userId}/projects",
+ *   summary="Dodaj projekat",
+ *   tags={"Projects"},
+ *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *   @OA\Response(response=200, description="Kreirano")
+ * )
+ * @OA\Put(
+ *   path="/users/{userId}/projects/{id}",
+ *   summary="Ažuriraj projekat",
+ *   tags={"Projects"},
+ *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+ *   @OA\Response(response=200, description="Ažurirano")
+ * )
+ * @OA\Delete(
+ *   path="/users/{userId}/projects/{id}",
+ *   summary="Obriši projekat",
+ *   tags={"Projects"},
+ *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+ *   @OA\Response(response=200, description="Obrisano")
+ * )
+ */
+
 /**
  * @OA\Get(
  *     path="/users/{userId}/projects",
- *     summary="Get projects for a user",
+ *     summary="Get projects for a user (owner or admin)",
  *     tags={"Projects"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(
@@ -12,140 +47,98 @@
  *         required=true,
  *         @OA\Schema(type="integer")
  *     ),
- *     @OA\Response(
- *         response=200,
- *         description="List of user projects",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="projects", type="array", @OA\Items(type="object"))
- *         )
- *     )
+ *     @OA\Response(response=200, description="List of projects"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-\Flight::get('/users/@userId/projects', function($userId) {
-    $projectService = \Flight::ProjectService();
-    $result = $projectService->getProjectsByUser($userId);
-    echo json_encode($result);
+Flight::get('/users/@userId/projects', function ($userId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $service = Flight::ProjectService();
+    Flight::json($service->getProjectsByUser((int)$userId));
 });
+
 
 /**
  * @OA\Post(
  *     path="/users/{userId}/projects",
- *     summary="Add project for a user",
+ *     summary="Add project (owner or admin)",
  *     tags={"Projects"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(
- *         name="userId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"title"},
- *             @OA\Property(property="title", type="string"),
- *             @OA\Property(property="description", type="string"),
- *             @OA\Property(property="technologies", type="string"),
- *             @OA\Property(property="link", type="string", format="uri"),
- *             @OA\Property(property="start_date", type="string", format="date"),
- *             @OA\Property(property="end_date", type="string", format="date")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Project added successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="message", type="string"),
- *             @OA\Property(property="project_id", type="integer")
- *         )
- *     )
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Response(response=200, description="Project added"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-\Flight::post('/users/@userId/projects', function($userId) {
-    $input = \Flight::request()->data;
-    $projectService = \Flight::ProjectService();
-    $result = $projectService->addProject($userId, $input);
-    echo json_encode($result);
+Flight::post('/users/@userId/projects', function ($userId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $data = Flight::request()->data->getData();
+    $service = Flight::ProjectService();
+    Flight::json($service->addProject((int)$userId, $data));
 });
+
 
 /**
  * @OA\Put(
  *     path="/users/{userId}/projects/{projectId}",
- *     summary="Update project",
+ *     summary="Update project (owner or admin)",
  *     tags={"Projects"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(
- *         name="userId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Parameter(
- *         name="projectId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="title", type="string"),
- *             @OA\Property(property="description", type="string"),
- *             @OA\Property(property="technologies", type="string"),
- *             @OA\Property(property="link", type="string", format="uri"),
- *             @OA\Property(property="start_date", type="string", format="date"),
- *             @OA\Property(property="end_date", type="string", format="date")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Project updated successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="message", type="string")
- *         )
- *     )
+ *     @OA\Response(response=200, description="Updated"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-\Flight::put('/users/@userId/projects/@projectId', function($userId, $projectId) {
-    $input = \Flight::request()->data;
-    $projectService = \Flight::ProjectService();
-    $result = $projectService->updateProject($userId, $projectId, $input);
-    echo json_encode($result);
+Flight::put('/users/@userId/projects/@projectId', function ($userId, $projectId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $data = Flight::request()->data->getData();
+    $service = Flight::ProjectService();
+    Flight::json($service->updateProject((int)$userId, (int)$projectId, $data));
 });
+
 
 /**
  * @OA\Delete(
  *     path="/users/{userId}/projects/{projectId}",
- *     summary="Delete project",
+ *     summary="Delete project (owner or admin)",
  *     tags={"Projects"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(
- *         name="userId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Parameter(
- *         name="projectId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Project deleted successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="message", type="string")
- *         )
- *     )
+ *     @OA\Response(response=200, description="Deleted"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-\Flight::delete('/users/@userId/projects/@projectId', function($userId, $projectId) {
-    $projectService = \Flight::ProjectService();
-    $result = $projectService->deleteProject($userId, $projectId);
-    echo json_encode($result);
+Flight::delete('/users/@userId/projects/@projectId', function ($userId, $projectId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $service = Flight::ProjectService();
+    Flight::json($service->deleteProject((int)$userId, (int)$projectId));
 });
-?>

@@ -18,7 +18,7 @@ class SkillService {
         $skillData = [
             'user_id' => $userId,
             'name' => $data['name'],
-            'level' => $data['level'],
+            'proficiency' => $data['level'],
             'category' => $data['category'] ?? 'general'
         ];
 

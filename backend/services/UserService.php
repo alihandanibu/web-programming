@@ -1,120 +1,194 @@
 <?php
+
 namespace app\services;
 
 use app\dao\UserDAO;
 use app\middleware\AuthMiddleware;
 
 class UserService {
-    private $userDAO;
-    private $authMiddleware;
+
+    private UserDAO $userDAO;
+    private AuthMiddleware $authMiddleware;
 
     public function __construct() {
         $this->userDAO = new UserDAO();
         $this->authMiddleware = new AuthMiddleware();
     }
 
-    public function register($data) {
-        if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
-            return ['success' => false, 'message' => 'Name, email, and password are required'];
+    /* =========================
+       REGISTER
+    ========================== */
+    public function register(array $data): array {
+        if (
+            empty($data['name']) ||
+            empty($data['email']) ||
+            empty($data['password'])
+        ) {
+            return [
+                'success' => false,
+                'message' => 'Name, email and password are required'
+            ];
         }
 
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            return ['success' => false, 'message' => 'Invalid email format'];
+            return [
+                'success' => false,
+                'message' => 'Invalid email format'
+            ];
         }
 
+        // default role = user
         $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
-        
+
         $userData = [
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $hashedPassword,
+            'role' => $data['role'] ?? 'user',
             'bio' => $data['bio'] ?? null,
             'location' => $data['location'] ?? null
         ];
 
         $userId = $this->userDAO->create($userData);
-        
+
         if ($userId) {
-            return ['success' => true, 'message' => 'User registered successfully', 'user_id' => $userId];
+            return [
+                'success' => true,
+                'message' => 'User registered successfully',
+                'user_id' => $userId
+            ];
         }
-        
-        return ['success' => false, 'message' => 'Registration failed'];
+
+        return [
+            'success' => false,
+            'message' => 'Registration failed'
+        ];
     }
 
-    public function login($email, $password) {
-        $user = $this->userDAO->getByEmail($email);
-        
+    /* =========================
+       LOGIN
+    ========================== */
+    public function login(string $email, string $password): array {
+        $user = $this->userDAO->findByEmail($email);
+
         if (!$user) {
-            return ['success' => false, 'message' => 'User not found'];
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
         }
 
         if (!password_verify($password, $user['password'])) {
-            return ['success' => false, 'message' => 'Invalid password'];
+            return [
+                'success' => false,
+                'message' => 'Invalid password'
+            ];
         }
 
-        $token = $this->authMiddleware->generateToken($user['id']);
-        
+        // JWT with ROLE (Milestone 4 requirement)
+        $token = $this->authMiddleware->generateToken(
+            (int)$user['id'],
+            $user['role']
+        );
+
         return [
             'success' => true,
             'message' => 'Login successful',
             'token' => $token,
             'user' => [
-                'id' => $user['id'],
+                'id' => (int)$user['id'],
                 'name' => $user['name'],
-                'email' => $user['email']
+                'email' => $user['email'],
+                'role' => $user['role']
             ]
         ];
     }
 
-    public function getUserById($userId) {
+    /* =========================
+       GET USER BY ID
+    ========================== */
+    public function getUserById(int $userId): array {
         $user = $this->userDAO->read($userId);
-        
+
         if (!$user) {
-            return ['success' => false, 'message' => 'User not found'];
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
         }
 
         unset($user['password']);
-        return ['success' => true, 'user' => $user];
+
+        return [
+            'success' => true,
+            'user' => $user
+        ];
     }
 
-    public function getAllUsers() {
+    /* =========================
+       GET ALL USERS (ADMIN)
+    ========================== */
+    public function getAllUsers(): array {
         $users = $this->userDAO->readAll();
-        
+
         foreach ($users as &$user) {
             unset($user['password']);
         }
 
-        return ['success' => true, 'users' => $users];
+        return [
+            'success' => true,
+            'users' => $users
+        ];
     }
 
-    public function updateUser($userId, $data) {
+    /* =========================
+       UPDATE USER
+    ========================== */
+    public function updateUser(int $userId, array $data): array {
         $user = $this->userDAO->read($userId);
-        
+
         if (!$user) {
-            return ['success' => false, 'message' => 'User not found'];
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
         }
 
-        if (isset($data['password'])) {
+        if (!empty($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         }
 
-        $success = $this->userDAO->update($userId, $data);
-        
-        if ($success) {
-            return ['success' => true, 'message' => 'User updated successfully'];
+        $updated = $this->userDAO->update($userId, $data);
+
+        if ($updated) {
+            return [
+                'success' => true,
+                'message' => 'User updated successfully'
+            ];
         }
 
-        return ['success' => false, 'message' => 'Update failed'];
+        return [
+            'success' => false,
+            'message' => 'Update failed'
+        ];
     }
 
-    public function deleteUser($userId) {
-        $success = $this->userDAO->delete($userId);
-        
-        if ($success) {
-            return ['success' => true, 'message' => 'User deleted successfully'];
+    /* =========================
+       DELETE USER (ADMIN)
+    ========================== */
+    public function deleteUser(int $userId): array {
+        $deleted = $this->userDAO->delete($userId);
+
+        if ($deleted) {
+            return [
+                'success' => true,
+                'message' => 'User deleted successfully'
+            ];
         }
 
-        return ['success' => false, 'message' => 'Delete failed'];
+        return [
+            'success' => false,
+            'message' => 'Delete failed'
+        ];
     }
 }
-?>
