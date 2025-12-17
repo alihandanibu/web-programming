@@ -83,9 +83,7 @@ For production, change the secret key in `backend/middleware/AuthMiddleware.php`
 
 ## Architecture
 
-```
 Request → Routes → AuthMiddleware → Services → DAO → MySQL
-```
 
 - **Routes** (`backend/routes/`): Define endpoints with Swagger annotations
 - **Services** (`backend/services/`): Business logic + validation + ownership checks
@@ -114,7 +112,7 @@ Swagger UI  `http://localhost/mojnoviprojekat/web-programming/backend/public/v1/
 6. Click Logout → Token removed, redirects to home
 7. Login as regular user → "Admin" link hidden
 
-## Defense Demo Steps
+## Defense Demo Steps - how the site works
 
 ### 1. Swagger Demo
 1. Open: `http://localhost/mojnoviprojekat/web-programming/backend/public/v1/docs/`
@@ -136,7 +134,7 @@ Swagger UI  `http://localhost/mojnoviprojekat/web-programming/backend/public/v1/
 7. Logout → Show navbar updates (Login/Register visible, Dashboard/Admin hidden)
 8. Login as regular user → Show Admin link is hidden
 
-### 3. Code Walkthrough
+### 3. Code
 1. Show `backend/index.php` — Flight routing + base path handling
 2. Show `backend/routes/UserRoutes.php` — Swagger annotations + middleware
 3. Show `backend/services/UserService.php` — Ownership validation
