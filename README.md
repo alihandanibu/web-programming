@@ -93,17 +93,9 @@ Request → Routes → AuthMiddleware → Services → DAO → MySQL
 - **Middleware** (`backend/middleware/AuthMiddleware.php`): JWT verification + role extraction
 
 ## Base URLs (Apache/XAMPP)
- Backend API | `http://localhost/mojnoviprojekat/web-programming/backend` |
-| Frontend SPA | `http://localhost/mojnoviprojekat/web-programming/frontend/` |
-| Swagger UI | `http://localhost/mojnoviprojekat/web-programming/backend/public/v1/docs/` |
-
-## Setup Instructions
-
-1. **XAMPP**: Start Apache + MySQL (port 3307)
-2. **Database**: Import `backend/config/database.sql` in phpMyAdmin
-
-
-
+Backend API `http://localhost/mojnoviprojekat/web-programming/backend`
+Frontend SPA  `http://localhost/mojnoviprojekat/web-programming/frontend/`
+Swagger UI  `http://localhost/mojnoviprojekat/web-programming/backend/public/v1/docs/`
 
 ## Role & Ownership Rules
 
@@ -111,38 +103,7 @@ Request → Routes → AuthMiddleware → Services → DAO → MySQL
 - **User**: Cannot access `GET /users` (returns 403)
 - **Owner**: Can only access their own `/users/{id}/*` endpoints
 - **Non-owner**: Gets 403 when accessing another user's data
-
-## Test Plan (Smoke Tests)
-
-### Backend Tests (PowerShell/curl)
-
-```powershell
-$base = "http://localhost/mojnoviprojekat/web-programming/backend"
-
-# 1. Health check
-Invoke-WebRequest "$base/health"
-# Expected: 200, {"status":"ok"}
-
-# 2. Admin login
-$login = Invoke-RestMethod -Uri "$base/auth/login" -Method Post -ContentType "application/json" -Body '{"email":"admin@portfolio.com","password":"password"}'
-$token = $login.token
-# Expected: success=true, token returned
-
-# 3. Verify token
-Invoke-RestMethod -Uri "$base/auth/verify" -Method Post -Headers @{Authorization="Bearer $token"}
-# Expected: valid=true, role=admin
-
-# 4. Get all users (admin)
-Invoke-WebRequest -Uri "$base/users" -Headers @{Authorization="Bearer $token"}
-# Expected: 200
-
-# 5. User login + forbidden test
-$userLogin = Invoke-RestMethod -Uri "$base/auth/login" -Method Post -ContentType "application/json" -Body '{"email":"user@test.com","password":"password"}'
-$userToken = $userLogin.token
-Invoke-WebRequest -Uri "$base/users" -Headers @{Authorization="Bearer $userToken"}
-# Expected: 403 Forbidden
-```
-
+- 
 ### Frontend Tests (Browser)
 
 1. Open `http://localhost/mojnoviprojekat/web-programming/frontend/`
@@ -186,9 +147,6 @@ Invoke-WebRequest -Uri "$base/users" -Headers @{Authorization="Bearer $userToken
 
 ### Backend
 - `backend/index.php` — Base path normalization for Apache
-- `backend/OpenApi.php` — Swagger server configuration
-- `backend/ApiDocs.php` — Doc-only operations for Swagger
-- `backend/routes/*` — All routes with Swagger annotations
 - `backend/services/*` — Ownership enforcement
 - `backend/middleware/AuthMiddleware.php` — Role extraction
 
