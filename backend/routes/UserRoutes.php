@@ -1,5 +1,7 @@
 <?php
 
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Get(
  *     path="/users",
@@ -24,7 +26,7 @@
  *     )
  * )
  */
-Flight::get('/users', function () {
+Flight::route('GET /users', function () {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
     $auth->requireAdmin();
@@ -61,7 +63,7 @@ Flight::get('/users', function () {
  *     )
  * )
  */
-Flight::get('/users/@id', function ($id) {
+Flight::route('GET /users/@id', function ($id) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
 
@@ -133,7 +135,14 @@ Flight::put('/users/@id', function ($id) {
 
     $data = Flight::request()->data->getData();
     $userService = Flight::UserService();
-    Flight::json($userService->updateUser((int)$id, $data));
+    $isAdmin = ($currentUser['role'] === 'admin');
+
+    // Prevent role tampering for normal users
+    if (!$isAdmin) {
+        unset($data['role']);
+    }
+
+    Flight::json($userService->updateUser((int)$id, $data, $isAdmin));
 });
 
 

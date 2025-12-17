@@ -13,6 +13,20 @@ body {
     color: var(--text);
 }
 
+/* SPA: show only active section (safe fallback)
+   If JS fails, all sections remain visible instead of blank page. */
+.spa-view {
+    display: block;
+}
+
+body.spa-ready .spa-view {
+    display: none;
+}
+
+body.spa-ready .spa-view.is-active {
+    display: block;
+}
+
 .hero-section {
     background: linear-gradient(135deg, var(--brand-prim), var(--brand-sec));
     color: #fff;
@@ -47,12 +61,46 @@ body {
 
 .nav-link.active {
     color: var(--brand-prim) !important;
+    font-weight: 600;
+}
+
+/* Skills bars (skills.html uses skill-track + skill-fill) */
+.skill-track {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.skill-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--brand-prim), var(--brand-sec));
+    transition: width 1.2s ease;
+    border-radius: 10px;
 }
 
 .profile-placeholder {
     background: #fff;
     border: 1px solid #e9ecef;
     border-radius: 12px;
+}
+
+/* Projects: emphasize cards without changing global card styling */
+#projects .card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
+}
+
+#projects .card.card-hover {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+#projects .card.card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .10);
 }
 
 /* Projects grid */

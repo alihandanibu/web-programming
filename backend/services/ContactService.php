@@ -1,13 +1,13 @@
 <?php
 namespace app\services;
 
-use app\dao\ContactDAO;
+require_once __DIR__ . '/../dao/ContactDAO.php';
 
 class ContactService {
     private $contactDAO;
 
     public function __construct() {
-        $this->contactDAO = new ContactDAO();
+        $this->contactDAO = new \ContactDAO();
     }
 
     public function submitContact($data) {
@@ -22,9 +22,8 @@ class ContactService {
         $contactData = [
             'name' => $data['name'],
             'email' => $data['email'],
-            'subject' => $data['subject'] ?? 'Contact Form Submission',
             'message' => $data['message'],
-            'created_at' => date('Y-m-d H:i:s')
+            'status' => 'unread'
         ];
 
         $contactId = $this->contactDAO->create($contactData);
@@ -37,7 +36,7 @@ class ContactService {
     }
 
     public function getContactsByUser($userId) {
-        $contacts = $this->contactDAO->getByUserId($userId);
+        $contacts = $this->contactDAO->findAll();
         
         if (empty($contacts)) {
             return ['success' => true, 'contacts' => []];
@@ -47,9 +46,8 @@ class ContactService {
     }
 
     public function deleteContact($userId, $contactId) {
-        $contact = $this->contactDAO->read($contactId);
-        
-        if (!$contact || $contact['user_id'] != $userId) {
+        $contact = $this->contactDAO->findById($contactId);
+        if (!$contact) {
             return ['success' => false, 'message' => 'Contact not found'];
         }
 

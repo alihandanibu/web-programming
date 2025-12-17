@@ -4,46 +4,14 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Get(
- *   path="/users/{userId}/experiences",
- *   summary="Lista iskustava",
- *   tags={"Experiences"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="OK")
- * )
- * @OA\Post(
- *   path="/users/{userId}/experiences",
- *   summary="Dodaj iskustvo",
- *   tags={"Experiences"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Kreirano")
- * )
- * @OA\Put(
- *   path="/users/{userId}/experiences/{id}",
- *   summary="Ažuriraj iskustvo",
- *   tags={"Experiences"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Ažurirano")
- * )
- * @OA\Delete(
- *   path="/users/{userId}/experiences/{id}",
- *   summary="Obriši iskustvo",
- *   tags={"Experiences"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Obrisano")
- * )
- */
-
-/**
- * @OA\Get(
  *     path="/users/{userId}/experiences",
  *     summary="Get experiences (owner or admin)",
  *     tags={"Experiences"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer"))
  * )
  */
-Flight::get('/users/@userId/experiences', function ($userId) {
+Flight::route('GET /users/@userId/experiences', function ($userId) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
 
@@ -57,7 +25,18 @@ Flight::get('/users/@userId/experiences', function ($userId) {
     Flight::json($service->getExperienceByUser((int)$userId));
 });
 
-
+/**
+ * @OA\Post(
+ *     path="/users/{userId}/experiences",
+ *     summary="Add experience (owner or admin)",
+ *     tags={"Experiences"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\Response(response=200, description="Created"),
+ *     @OA\Response(response=403, description="Forbidden")
+ * )
+ */
 Flight::post('/users/@userId/experiences', function ($userId) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
@@ -73,7 +52,19 @@ Flight::post('/users/@userId/experiences', function ($userId) {
     Flight::json($service->addExperience((int)$userId, $data));
 });
 
-
+/**
+ * @OA\Put(
+ *     path="/users/{userId}/experiences/{experienceId}",
+ *     summary="Update experience (owner or admin)",
+ *     tags={"Experiences"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="experienceId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\Response(response=200, description="Updated"),
+ *     @OA\Response(response=403, description="Forbidden")
+ * )
+ */
 Flight::put('/users/@userId/experiences/@experienceId', function ($userId, $experienceId) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
@@ -89,7 +80,18 @@ Flight::put('/users/@userId/experiences/@experienceId', function ($userId, $expe
     Flight::json($service->updateExperience((int)$userId, (int)$experienceId, $data));
 });
 
-
+/**
+ * @OA\Delete(
+ *     path="/users/{userId}/experiences/{experienceId}",
+ *     summary="Delete experience (owner or admin)",
+ *     tags={"Experiences"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="experienceId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Response(response=200, description="Deleted"),
+ *     @OA\Response(response=403, description="Forbidden")
+ * )
+ */
 Flight::delete('/users/@userId/experiences/@experienceId', function ($userId, $experienceId) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();

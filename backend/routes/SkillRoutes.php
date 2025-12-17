@@ -2,48 +2,17 @@
 
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Get(
- *   path="/users/{userId}/skills",
- *   summary="Lista vještina",
- *   tags={"Skills"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="OK")
- * )
- * @OA\Post(
- *   path="/users/{userId}/skills",
- *   summary="Dodaj vještinu",
- *   tags={"Skills"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Kreirano")
- * )
- * @OA\Put(
- *   path="/users/{userId}/skills/{id}",
- *   summary="Ažuriraj vještinu",
- *   tags={"Skills"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Ažurirano")
- * )
- * @OA\Delete(
- *   path="/users/{userId}/skills/{id}",
- *   summary="Obriši vještinu",
- *   tags={"Skills"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Obrisano")
- * )
- */
 
 /**
  * @OA\Get(
  *     path="/users/{userId}/skills",
  *     summary="Get skills (owner or admin)",
  *     tags={"Skills"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer"))
  * )
  */
-Flight::get('/users/@userId/skills', function ($userId) {
+Flight::route('GET /users/@userId/skills', function ($userId) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
 
@@ -63,7 +32,8 @@ Flight::get('/users/@userId/skills', function ($userId) {
  *     path="/users/{userId}/skills",
  *     summary="Add skill (owner or admin)",
  *     tags={"Skills"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer"))
  * )
  */
 Flight::post('/users/@userId/skills', function ($userId) {
@@ -87,7 +57,9 @@ Flight::post('/users/@userId/skills', function ($userId) {
  *     path="/users/{userId}/skills/{skillId}",
  *     summary="Update skill (owner or admin)",
  *     tags={"Skills"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="skillId", in="path", required=true, @OA\Schema(type="integer"))
  * )
  */
 Flight::put('/users/@userId/skills/@skillId', function ($userId, $skillId) {
@@ -111,7 +83,9 @@ Flight::put('/users/@userId/skills/@skillId', function ($userId, $skillId) {
  *     path="/users/{userId}/skills/{skillId}",
  *     summary="Delete skill (owner or admin)",
  *     tags={"Skills"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="skillId", in="path", required=true, @OA\Schema(type="integer"))
  * )
  */
 Flight::delete('/users/@userId/skills/@skillId', function ($userId, $skillId) {

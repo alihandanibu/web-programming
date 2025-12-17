@@ -7,6 +7,7 @@ USE portfolio;
 -- Users table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') DEFAULT 'user',
@@ -64,9 +65,9 @@ CREATE TABLE contacts (
 );
 
 -- Insert sample data
-INSERT INTO users (email, password, role) VALUES 
-('admin@portfolio.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-('user@portfolio.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user');
+INSERT INTO users (name, email, password, role) VALUES 
+('Admin', 'admin@portfolio.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
+('User', 'user@portfolio.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user');
 
 INSERT INTO projects (title, description, user_id, project_url, github_url) VALUES 
 ('E-commerce Website', 'Full-stack e-commerce platform with React and Node.js', 1, 'https://example.com', 'https://github.com/example'),

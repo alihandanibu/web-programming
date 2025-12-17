@@ -2,60 +2,77 @@
 
 namespace app\services;
 
-use app\dao\UserDAO;
 use app\middleware\AuthMiddleware;
+
+require_once __DIR__ . '/../dao/UserDAO.php';
 
 class UserService {
 
-    private UserDAO $userDAO;
+    private \UserDAO $userDAO;
     private AuthMiddleware $authMiddleware;
 
     public function __construct() {
-        $this->userDAO = new UserDAO();
+        $this->userDAO = new \UserDAO();
         $this->authMiddleware = new AuthMiddleware();
     }
 
     /* =========================
-       REGISTER
+       REGISTER (PUBLIC)
+       - Always creates a normal "user"
+       - Prevents role escalation via request payload
     ========================== */
     public function register(array $data): array {
-        if (
-            empty($data['name']) ||
-            empty($data['email']) ||
-            empty($data['password'])
-        ) {
+        $name = trim((string)($data['name'] ?? ''));
+        $email = trim((string)($data['email'] ?? ''));
+        $password = (string)($data['password'] ?? '');
+
+        if ($name === '' || $email === '' || $password === '') {
             return [
                 'success' => false,
                 'message' => 'Name, email and password are required'
             ];
         }
 
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return [
                 'success' => false,
                 'message' => 'Invalid email format'
             ];
         }
 
-        // default role = user
-        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+        // Email uniqueness check (better UX than a raw DB error)
+        if ($this->userDAO->findByEmail($email)) {
+            return [
+                'success' => false,
+                'message' => 'Email already exists'
+            ];
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
         $userData = [
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'name' => $name,
+            'email' => $email,
             'password' => $hashedPassword,
-            'role' => $data['role'] ?? 'user',
-            'bio' => $data['bio'] ?? null,
-            'location' => $data['location'] ?? null
+            // IMPORTANT: do NOT accept role from the client
+            'role' => 'user'
         ];
 
-        $userId = $this->userDAO->create($userData);
+        try {
+            $userId = $this->userDAO->create($userData);
+        } catch (\Throwable $e) {
+            error_log($e);
+            return [
+                'success' => false,
+                'message' => 'Registration failed'
+            ];
+        }
 
         if ($userId) {
             return [
                 'success' => true,
                 'message' => 'User registered successfully',
-                'user_id' => $userId
+                'user_id' => (int)$userId
             ];
         }
 
@@ -66,9 +83,18 @@ class UserService {
     }
 
     /* =========================
-       LOGIN
+       LOGIN (PUBLIC)
     ========================== */
     public function login(string $email, string $password): array {
+        $email = trim($email);
+
+        if ($email === '' || $password === '') {
+            return [
+                'success' => false,
+                'message' => 'Email and password are required'
+            ];
+        }
+
         $user = $this->userDAO->findByEmail($email);
 
         if (!$user) {
@@ -88,7 +114,7 @@ class UserService {
         // JWT with ROLE (Milestone 4 requirement)
         $token = $this->authMiddleware->generateToken(
             (int)$user['id'],
-            $user['role']
+            (string)$user['role']
         );
 
         return [
@@ -97,7 +123,7 @@ class UserService {
             'token' => $token,
             'user' => [
                 'id' => (int)$user['id'],
-                'name' => $user['name'],
+                'name' => $user['name'] ?? '',
                 'email' => $user['email'],
                 'role' => $user['role']
             ]
@@ -108,7 +134,7 @@ class UserService {
        GET USER BY ID
     ========================== */
     public function getUserById(int $userId): array {
-        $user = $this->userDAO->read($userId);
+        $user = $this->userDAO->findById($userId);
 
         if (!$user) {
             return [
@@ -129,7 +155,7 @@ class UserService {
        GET ALL USERS (ADMIN)
     ========================== */
     public function getAllUsers(): array {
-        $users = $this->userDAO->readAll();
+        $users = $this->userDAO->findAll();
 
         foreach ($users as &$user) {
             unset($user['password']);
@@ -143,9 +169,11 @@ class UserService {
 
     /* =========================
        UPDATE USER
+       - Owner can update: name/email/password
+       - Admin can also update: role
     ========================== */
-    public function updateUser(int $userId, array $data): array {
-        $user = $this->userDAO->read($userId);
+    public function updateUser(int $userId, array $data, bool $isAdmin = false): array {
+        $user = $this->userDAO->findById($userId);
 
         if (!$user) {
             return [
@@ -154,11 +182,60 @@ class UserService {
             ];
         }
 
-        if (!empty($data['password'])) {
-            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        // Validate & normalize fields
+        $updateData = [];
+
+        if (array_key_exists('name', $data)) {
+            $name = trim((string)$data['name']);
+            if ($name === '') {
+                return ['success' => false, 'message' => 'Name cannot be empty'];
+            }
+            $updateData['name'] = $name;
         }
 
-        $updated = $this->userDAO->update($userId, $data);
+        if (array_key_exists('email', $data)) {
+            $email = trim((string)$data['email']);
+            if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return ['success' => false, 'message' => 'Invalid email format'];
+            }
+
+            $existing = $this->userDAO->findByEmail($email);
+            if ($existing && (int)$existing['id'] !== (int)$userId) {
+                return ['success' => false, 'message' => 'Email already exists'];
+            }
+
+            $updateData['email'] = $email;
+        }
+
+        if (!empty($data['password'])) {
+            $updateData['password'] = password_hash((string)$data['password'], PASSWORD_BCRYPT);
+        }
+
+        // Role updates are ADMIN-only
+        if ($isAdmin && array_key_exists('role', $data)) {
+            $role = (string)$data['role'];
+            if (!in_array($role, ['admin', 'user'], true)) {
+                return ['success' => false, 'message' => 'Invalid role'];
+            }
+            $updateData['role'] = $role;
+        }
+
+        if (empty($updateData)) {
+            return [
+                'success' => false,
+                'message' => 'No valid fields to update'
+            ];
+        }
+
+        try {
+            $updated = $this->userDAO->update($userId, $updateData);
+        } catch (\Throwable $e) {
+            error_log($e);
+            return [
+                'success' => false,
+                'message' => 'Update failed'
+            ];
+        }
 
         if ($updated) {
             return [
@@ -177,7 +254,15 @@ class UserService {
        DELETE USER (ADMIN)
     ========================== */
     public function deleteUser(int $userId): array {
-        $deleted = $this->userDAO->delete($userId);
+        try {
+            $deleted = $this->userDAO->delete($userId);
+        } catch (\Throwable $e) {
+            error_log($e);
+            return [
+                'success' => false,
+                'message' => 'Delete failed'
+            ];
+        }
 
         if ($deleted) {
             return [

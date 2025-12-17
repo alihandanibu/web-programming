@@ -1,5 +1,7 @@
 <?php
 
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Post(
  *     path="/contact",
@@ -22,7 +24,7 @@ Flight::post('/contact', function () {
  *     security={{"bearerAuth":{}}}
  * )
  */
-Flight::get('/users/@userId/contacts', function ($userId) {
+Flight::route('GET /users/@userId/contacts', function ($userId) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
     $auth->requireAdmin();

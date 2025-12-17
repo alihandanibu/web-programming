@@ -1,6 +1,23 @@
-const API_BASE = 'http://localhost:3000';
+function computeApiBase() {
+  // API_BASE is derived from <base href> (XAMPP subfolder setup)
+  const baseEl = document.querySelector('base');
+  const baseHref = baseEl ? baseEl.getAttribute('href') : null;
 
-// Get JWT token from localStorage
+  try {
+    const baseUrl = new URL(baseHref || '/', window.location.origin);
+    let path = baseUrl.pathname.replace(/\/+$/, '');
+    if (path.endsWith('/frontend')) {
+      path = path.slice(0, -'/frontend'.length);
+    }
+    return window.location.origin + path + '/backend';
+  } catch (e) {
+    return window.location.origin + '/mojnoviprojekat/web-programming/backend';
+  }
+}
+
+const API_BASE = computeApiBase();
+
+// JWT token
 function getToken() {
   return localStorage.getItem('token');
 }
@@ -83,9 +100,46 @@ function apiGetProjects(userId) {
   }).then(r => r.json());
 }
 
+function apiAddProject(userId, data) {
+  return fetch(`${API_BASE}/users/${userId}/projects`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: JSON.stringify(data)
+  }).then(r => r.json());
+}
+
+function apiDeleteProject(userId, projectId) {
+  return fetch(`${API_BASE}/users/${userId}/projects/${projectId}`, {
+    method: 'DELETE',
+    headers: getHeaders(true)
+  }).then(r => r.json());
+}
+
 // ===== SKILLS =====
 function apiGetSkills(userId) {
   return fetch(`${API_BASE}/users/${userId}/skills`, {
+    headers: getHeaders(true)
+  }).then(r => r.json());
+}
+
+function apiAddSkill(userId, data) {
+  return fetch(`${API_BASE}/users/${userId}/skills`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: JSON.stringify(data)
+  }).then(r => r.json());
+}
+
+function apiDeleteSkill(userId, skillId) {
+  return fetch(`${API_BASE}/users/${userId}/skills/${skillId}`, {
+    method: 'DELETE',
+    headers: getHeaders(true)
+  }).then(r => r.json());
+}
+
+// ===== EXPERIENCES =====
+function apiGetExperiences(userId) {
+  return fetch(`${API_BASE}/users/${userId}/experiences`, {
     headers: getHeaders(true)
   }).then(r => r.json());
 }

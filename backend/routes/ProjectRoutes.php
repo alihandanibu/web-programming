@@ -2,38 +2,6 @@
 
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Get(
- *   path="/users/{userId}/projects",
- *   summary="Lista projekata za korisnika",
- *   tags={"Projects"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="OK")
- * )
- * @OA\Post(
- *   path="/users/{userId}/projects",
- *   summary="Dodaj projekat",
- *   tags={"Projects"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Kreirano")
- * )
- * @OA\Put(
- *   path="/users/{userId}/projects/{id}",
- *   summary="Ažuriraj projekat",
- *   tags={"Projects"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Ažurirano")
- * )
- * @OA\Delete(
- *   path="/users/{userId}/projects/{id}",
- *   summary="Obriši projekat",
- *   tags={"Projects"},
- *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *   @OA\Response(response=200, description="Obrisano")
- * )
- */
 
 /**
  * @OA\Get(
@@ -51,7 +19,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-Flight::get('/users/@userId/projects', function ($userId) {
+Flight::route('GET /users/@userId/projects', function ($userId) {
     $auth = Flight::AuthMiddleware();
     $auth->requireAuth();
 
@@ -99,6 +67,8 @@ Flight::post('/users/@userId/projects', function ($userId) {
  *     summary="Update project (owner or admin)",
  *     tags={"Projects"},
  *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="projectId", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="Updated"),
  *     @OA\Response(response=403, description="Forbidden")
  * )
@@ -125,6 +95,8 @@ Flight::put('/users/@userId/projects/@projectId', function ($userId, $projectId)
  *     summary="Delete project (owner or admin)",
  *     tags={"Projects"},
  *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="projectId", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="Deleted"),
  *     @OA\Response(response=403, description="Forbidden")
  * )

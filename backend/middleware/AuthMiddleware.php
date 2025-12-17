@@ -35,8 +35,7 @@ class AuthMiddleware {
         $token = $this->extractToken();
 
         if (!$token) {
-            Flight::json(['error' => 'Missing token'], 401);
-            exit;
+            Flight::jsonHalt(['error' => 'Missing token'], 401);
         }
 
         try {
@@ -49,8 +48,7 @@ class AuthMiddleware {
             Flight::set('user', (array) $decoded);
 
         } catch (\Exception $e) {
-            Flight::json(['error' => 'Invalid or expired token'], 401);
-            exit;
+            Flight::jsonHalt(['error' => 'Invalid or expired token'], 401);
         }
     }
 
@@ -61,8 +59,7 @@ class AuthMiddleware {
         $user = Flight::get('user');
 
         if (!$user || !isset($user['role']) || $user['role'] !== 'admin') {
-            Flight::json(['error' => 'Forbidden'], 403);
-            exit;
+            Flight::jsonHalt(['error' => 'Forbidden'], 403);
         }
     }
 
@@ -70,13 +67,24 @@ class AuthMiddleware {
        TOKEN EXTRACTOR
     ========================== */
     private function extractToken(): ?string {
-        $headers = getallheaders();
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
 
-        if (isset($headers['Authorization'])) {
-            $parts = explode(' ', $headers['Authorization'], 2);
-            if (count($parts) === 2 && $parts[0] === 'Bearer') {
-                return $parts[1];
-            }
+        // Some environments use different header keys
+        $authHeader =
+            $headers['Authorization'] ??
+            $headers['authorization'] ??
+            ($_SERVER['HTTP_AUTHORIZATION'] ?? null) ??
+            ($_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? null);
+
+        if (!$authHeader || !is_string($authHeader)) {
+            return null;
+        }
+
+        $authHeader = trim($authHeader);
+        $parts = preg_split('/\s+/', $authHeader, 2);
+
+        if (count($parts) === 2 && strcasecmp($parts[0], 'Bearer') === 0) {
+            return trim($parts[1]);
         }
 
         return null;
