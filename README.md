@@ -21,8 +21,6 @@ This repository contains the frontend for my portfolio project for Milestone 1. 
 - `backend/dao/` - DAO classes for database access
 - `backend/test_dao.php` - test if backend works
 
-**Contact:** alihandan@stu.ibu.edu.ba
-
 # Handan Portfolio — Milestone 3
 
 ## What's New in Milestone 3:
