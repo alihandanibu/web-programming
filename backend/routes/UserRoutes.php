@@ -1,9 +1,11 @@
 <?php
 
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Get(
  *     path="/users",
- *     summary="Get all users",
+ *     summary="Get all users (admin only)",
  *     tags={"Users"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Response(
@@ -11,21 +13,33 @@
  *         description="List of all users",
  *         @OA\JsonContent(
  *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="users", type="array", @OA\Items(type="object"))
+ *             @OA\Property(
+ *                 property="users",
+ *                 type="array",
+ *                 @OA\Items(type="object")
+ *             )
  *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden"
  *     )
  * )
  */
-\Flight::get('/users', function() {
-    $userService = \Flight::UserService();
-    $result = $userService->getAllUsers();
-    echo json_encode($result);
+Flight::route('GET /users', function () {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+    $auth->requireAdmin();
+
+    $userService = Flight::UserService();
+    Flight::json($userService->getAllUsers());
 });
+
 
 /**
  * @OA\Get(
  *     path="/users/{id}",
- *     summary="Get user by ID",
+ *     summary="Get user by ID (owner or admin)",
  *     tags={"Users"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(
@@ -42,19 +56,36 @@
  *             @OA\Property(property="success", type="boolean"),
  *             @OA\Property(property="user", type="object")
  *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden"
  *     )
  * )
  */
-\Flight::get('/users/@id', function($id) {
-    $userService = \Flight::UserService();
-    $result = $userService->getUserById($id);
-    echo json_encode($result);
+Flight::route('GET /users/@id', function ($id) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+
+    if (
+        $currentUser['role'] !== 'admin' &&
+        (int)$currentUser['user_id'] !== (int)$id
+    ) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $userService = Flight::UserService();
+    Flight::json($userService->getUserById((int)$id));
 });
+
 
 /**
  * @OA\Put(
  *     path="/users/{id}",
- *     summary="Update user",
+ *     summary="Update user (owner or admin)",
  *     tags={"Users"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(
@@ -65,9 +96,11 @@
  *         @OA\Schema(type="integer")
  *     ),
  *     @OA\RequestBody(
+ *         required=true,
  *         @OA\JsonContent(
  *             @OA\Property(property="name", type="string"),
  *             @OA\Property(property="email", type="string", format="email"),
+ *             @OA\Property(property="password", type="string", format="password"),
  *             @OA\Property(property="bio", type="string"),
  *             @OA\Property(property="location", type="string")
  *         )
@@ -79,20 +112,44 @@
  *             @OA\Property(property="success", type="boolean"),
  *             @OA\Property(property="message", type="string")
  *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden"
  *     )
  * )
  */
-\Flight::put('/users/@id', function($id) {
-    $input = \Flight::request()->data;
-    $userService = \Flight::UserService();
-    $result = $userService->updateUser($id, $input);
-    echo json_encode($result);
+Flight::put('/users/@id', function ($id) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+
+    if (
+        $currentUser['role'] !== 'admin' &&
+        (int)$currentUser['user_id'] !== (int)$id
+    ) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $data = Flight::request()->data->getData();
+    $userService = Flight::UserService();
+    $isAdmin = ($currentUser['role'] === 'admin');
+
+    // Prevent role tampering for normal users
+    if (!$isAdmin) {
+        unset($data['role']);
+    }
+
+    Flight::json($userService->updateUser((int)$id, $data, $isAdmin));
 });
+
 
 /**
  * @OA\Delete(
  *     path="/users/{id}",
- *     summary="Delete user",
+ *     summary="Delete user (admin only)",
  *     tags={"Users"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(
@@ -109,12 +166,18 @@
  *             @OA\Property(property="success", type="boolean"),
  *             @OA\Property(property="message", type="string")
  *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden"
  *     )
  * )
  */
-\Flight::delete('/users/@id', function($id) {
-    $userService = \Flight::UserService();
-    $result = $userService->deleteUser($id);
-    echo json_encode($result);
+Flight::delete('/users/@id', function ($id) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+    $auth->requireAdmin();
+
+    $userService = Flight::UserService();
+    Flight::json($userService->deleteUser((int)$id));
 });
-?>

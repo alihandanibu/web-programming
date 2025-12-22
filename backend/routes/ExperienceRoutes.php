@@ -1,149 +1,107 @@
 <?php
 
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Get(
  *     path="/users/{userId}/experiences",
- *     summary="Get experiences for a user",
+ *     summary="Get experiences (owner or admin)",
  *     tags={"Experiences"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(
- *         name="userId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="List of user experiences",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="experiences", type="array", @OA\Items(type="object"))
- *         )
- *     )
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer"))
  * )
  */
-\Flight::get('/users/@userId/experiences', function($userId) {
-    $experienceService = \Flight::ExperienceService();
-    $result = $experienceService->getExperienceByUser($userId);
-    echo json_encode($result);
+Flight::route('GET /users/@userId/experiences', function ($userId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $service = Flight::ExperienceService();
+    Flight::json($service->getExperienceByUser((int)$userId));
 });
 
 /**
  * @OA\Post(
  *     path="/users/{userId}/experiences",
- *     summary="Add experience for a user",
+ *     summary="Add experience (owner or admin)",
  *     tags={"Experiences"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(
- *         name="userId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"title","company"},
- *             @OA\Property(property="title", type="string"),
- *             @OA\Property(property="company", type="string"),
- *             @OA\Property(property="start_date", type="string", format="date"),
- *             @OA\Property(property="end_date", type="string", format="date"),
- *             @OA\Property(property="description", type="string")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Experience added successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="message", type="string"),
- *             @OA\Property(property="experience_id", type="integer")
- *         )
- *     )
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\Response(response=200, description="Created"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-\Flight::post('/users/@userId/experiences', function($userId) {
-    $input = \Flight::request()->data;
-    $experienceService = \Flight::ExperienceService();
-    $result = $experienceService->addExperience($userId, $input);
-    echo json_encode($result);
+Flight::post('/users/@userId/experiences', function ($userId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $data = Flight::request()->data->getData();
+    $service = Flight::ExperienceService();
+    Flight::json($service->addExperience((int)$userId, $data));
 });
 
 /**
  * @OA\Put(
  *     path="/users/{userId}/experiences/{experienceId}",
- *     summary="Update experience",
+ *     summary="Update experience (owner or admin)",
  *     tags={"Experiences"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(
- *         name="userId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Parameter(
- *         name="experienceId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="title", type="string"),
- *             @OA\Property(property="company", type="string"),
- *             @OA\Property(property="start_date", type="string", format="date"),
- *             @OA\Property(property="end_date", type="string", format="date"),
- *             @OA\Property(property="description", type="string")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Experience updated successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="message", type="string")
- *         )
- *     )
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="experienceId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\Response(response=200, description="Updated"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-\Flight::put('/users/@userId/experiences/@experienceId', function($userId, $experienceId) {
-    $input = \Flight::request()->data;
-    $experienceService = \Flight::ExperienceService();
-    $result = $experienceService->updateExperience($userId, $experienceId, $input);
-    echo json_encode($result);
+Flight::put('/users/@userId/experiences/@experienceId', function ($userId, $experienceId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $data = Flight::request()->data->getData();
+    $service = Flight::ExperienceService();
+    Flight::json($service->updateExperience((int)$userId, (int)$experienceId, $data));
 });
 
 /**
  * @OA\Delete(
  *     path="/users/{userId}/experiences/{experienceId}",
- *     summary="Delete experience",
+ *     summary="Delete experience (owner or admin)",
  *     tags={"Experiences"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(
- *         name="userId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Parameter(
- *         name="experienceId",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Experience deleted successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean"),
- *             @OA\Property(property="message", type="string")
- *         )
- *     )
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Parameter(name="experienceId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Response(response=200, description="Deleted"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
-\Flight::delete('/users/@userId/experiences/@experienceId', function($userId, $experienceId) {
-    $experienceService = \Flight::ExperienceService();
-    $result = $experienceService->deleteExperience($userId, $experienceId);
-    echo json_encode($result);
+Flight::delete('/users/@userId/experiences/@experienceId', function ($userId, $experienceId) {
+    $auth = Flight::AuthMiddleware();
+    $auth->requireAuth();
+
+    $currentUser = Flight::get('user');
+    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+        Flight::json(['error' => 'Forbidden'], 403);
+        return;
+    }
+
+    $service = Flight::ExperienceService();
+    Flight::json($service->deleteExperience((int)$userId, (int)$experienceId));
 });
-?>

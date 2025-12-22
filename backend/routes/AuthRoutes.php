@@ -1,5 +1,7 @@
 <?php
 
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Post(
  *     path="/auth/register",
@@ -28,10 +30,10 @@
  * )
  */
 \Flight::post('/auth/register', function() {
-    $input = \Flight::request()->data;
+    $input = \Flight::request()->data->getData();
     $userService = \Flight::UserService();
     $result = $userService->register($input);
-    echo json_encode($result);
+    \Flight::json($result);
 });
 
 /**
@@ -60,10 +62,19 @@
  * )
  */
 \Flight::post('/auth/login', function() {
-    $input = \Flight::request()->data;
+    $input = \Flight::request()->data->getData();
+
+    $email = $input['email'] ?? '';
+    $password = $input['password'] ?? '';
+
+    if (empty($email) || empty($password)) {
+        \Flight::json(['success' => false, 'message' => 'Email and password are required'], 400);
+        return;
+    }
+
     $userService = \Flight::UserService();
-    $result = $userService->login($input['email'], $input['password']);
-    echo json_encode($result);
+    $result = $userService->login((string)$email, (string)$password);
+    \Flight::json($result, $result['success'] ? 200 : 401);
 });
 
 /**
@@ -83,16 +94,13 @@
  * )
  */
 \Flight::post('/auth/verify', function() {
-    $authMiddleware = \Flight::AuthMiddleware();
-    $token = $authMiddleware->extractToken($_SERVER);
-    
-    if (!$token) {
-        http_response_code(401);
-        echo json_encode(['valid' => false, 'message' => 'Token not found']);
-        return;
-    }
+    $auth = \Flight::AuthMiddleware();
+    $auth->requireAuth();
 
-    $result = $authMiddleware->verifyToken($token);
-    echo json_encode($result);
+    $user = \Flight::get('user');
+    \Flight::json([
+        'valid' => true,
+        'user' => $user
+    ]);
 });
 ?>

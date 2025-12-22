@@ -1,9 +1,31 @@
-<section id="projects" class="section-padding bg-light">
+<section class="section-padding bg-light">
     <div class="container">
-        <h2 class="section-title">My Projects</h2>
-        <div class="row">
+        <div class="bg-white border rounded-3 p-4 mb-4">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                    <h2 class="section-title mb-1">My Projects</h2>
+                    <p class="text-muted mb-0">Selected work and projects from university and personal initiatives.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="https://github.com/alihandanibu" class="btn btn-outline-primary" target="_blank">
+                        <i class="fab fa-github me-2"></i>GitHub
+                    </a>
+                    <a href="#contact" class="btn btn-primary">Contact</a>
+                </div>
+            </div>
+        </div>
+        <!-- Dynamic container for logged-in user's projects -->
+        <div id="user-projects-container" class="d-none row g-4"></div>
+        <!-- Static public content - Handan's Showcase Portfolio -->
+        <div id="static-projects-content">
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Showcase Portfolio:</strong> Projects below belong to Handan (site owner). 
+            <a href="#login" class="alert-link">Login</a> to see your own projects.
+          </div>
+          <div class="row g-4">
     
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6">
                 <div class="card card-hover h-100">
                     <div class="card-body">
                         <div class="project-icon mb-3">
@@ -24,7 +46,8 @@
                     </div>
                 </div>
             </div>
-                        <div class="col-lg-4 col-md-6 mb-4">
+
+            <div class="col-lg-4 col-md-6">
                 <div class="card card-hover h-100">
                     <div class="card-body">
                         <div class="project-icon mb-3">
@@ -46,7 +69,7 @@
             </div>
 
            
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6">
                 <div class="card card-hover h-100">
                     <div class="card-body">
                         <div class="project-icon mb-3">
@@ -99,7 +122,7 @@
             </div>
 
            
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6">
                 <div class="card card-hover h-100">
                     <div class="card-body">
                         <div class="project-icon mb-3">
@@ -127,7 +150,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6">
                 <div class="card card-hover h-100">
                     <div class="card-body">
                         <div class="project-icon mb-3">
@@ -156,7 +179,7 @@
                 </div>
             </div>
     
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6">
                 <div class="card card-hover h-100">
                     <div class="card-body">
                         <div class="project-icon mb-3">
@@ -178,6 +201,9 @@
                 </div>
             </div>
         </div>
+          </div>
+        </div>
+        <!-- End static-projects-content -->
 
         <div class="row mt-5">
             <div class="col-12 text-center">

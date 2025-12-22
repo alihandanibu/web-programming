@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Handan Portfolio - IT Student</title>
+
+    <base href="/mojnoviprojekat/web-programming/frontend/">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/spapp.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#home">
+                <i class="fas fa-code me-2"></i>Handan Portfolio
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://github.com/alihandanibu" target="_blank">GitHub</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#login">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#register">Register</a></li>
+                    <li class="nav-item" id="dashboardNav" style="display:none;"><a class="nav-link" href="#dashboard">Dashboard</a></li>
+                    <li class="nav-item" id="adminNav" style="display:none;"><a class="nav-link" href="#admin">Admin</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main id="spapp" class="container" style="padding-top: 90px;">
+        <?php include 'views/home.html'; ?>
+        <?php include 'views/about.html'; ?>
+        <?php include 'views/projects.html'; ?>
+        <?php include 'views/skills.html'; ?>
+        <?php include 'views/contact.html'; ?>
+        <?php include 'views/login.html'; ?>
+        <?php include 'views/register.html'; ?>
+        <?php include 'views/dashboard.html'; ?>
+        <?php include 'views/admin.html'; ?>
+        <?php include 'views/error_404.html'; ?>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p>&copy; 2025 Handan Portfolio. All rights reserved.</p>
+            <div class="social-links">
+                <a href="https://github.com/alihandanibu" class="text-white me-3" target="_blank">
+                    <i class="fab fa-github fa-lg"></i> GitHub
+                </a>
+                <a href="#contact" class="text-white me-3">
+                    <i class="fas fa-envelope fa-lg"></i> Contact
+                </a>
+                <a href="#about" class="text-white">
+                    <i class="fas fa-user fa-lg"></i> About
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        if (!location.hash) {
+            location.replace(location.pathname + "#home");
+        }
+    </script>
+
+    <!-- Core libs -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/spapp.min.js"></script>
+
+    <!-- API LAYER (OBAVEZNO PRIJE APP-A) -->
+    <script src="js/api.js"></script>
+
+    <!-- SPA / ROUTING -->
+    <script src="js/app.js"></script>
+
+    <!-- PAGE LOGIC -->
+    <script src="js/dashboard.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/features.js"></script>
+
+    <!-- UI -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

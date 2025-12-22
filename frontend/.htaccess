@@ -1,0 +1,33 @@
+# Enable CORS for AJAX requests
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# Ensure proper MIME types
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType text/html .html
+</IfModule>
+
+# Serve index.html by default when hitting the folder
+DirectoryIndex index.html index.php
+
+# SPA fallback: if a hashless direct route is hit, send to index.html
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /mojnoviprojekat/web-programming/frontend/
+
+    # Serve real files/folders as-is
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Skip favicon lookups (avoid 404 spam)
+    RewriteRule ^favicon\.ico$ - [L]
+
+    # All other requests fall back to SPA entry
+    RewriteRule ^.*$ index.html [L]
+</IfModule>

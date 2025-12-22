@@ -1,120 +1,279 @@
 <?php
+
 namespace app\services;
 
-use app\dao\UserDAO;
 use app\middleware\AuthMiddleware;
 
+require_once __DIR__ . '/../dao/UserDAO.php';
+
 class UserService {
-    private $userDAO;
-    private $authMiddleware;
+
+    private \UserDAO $userDAO;
+    private AuthMiddleware $authMiddleware;
 
     public function __construct() {
-        $this->userDAO = new UserDAO();
+        $this->userDAO = new \UserDAO();
         $this->authMiddleware = new AuthMiddleware();
     }
 
-    public function register($data) {
-        if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
-            return ['success' => false, 'message' => 'Name, email, and password are required'];
+    /* =========================
+       REGISTER (PUBLIC)
+       - Always creates a normal "user"
+       - Prevents role escalation via request payload
+    ========================== */
+    public function register(array $data): array {
+        $name = trim((string)($data['name'] ?? ''));
+        $email = trim((string)($data['email'] ?? ''));
+        $password = (string)($data['password'] ?? '');
+
+        if ($name === '' || $email === '' || $password === '') {
+            return [
+                'success' => false,
+                'message' => 'Name, email and password are required'
+            ];
         }
 
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            return ['success' => false, 'message' => 'Invalid email format'];
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return [
+                'success' => false,
+                'message' => 'Invalid email format'
+            ];
         }
 
-        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
-        
+        // Email uniqueness check (better UX than a raw DB error)
+        if ($this->userDAO->findByEmail($email)) {
+            return [
+                'success' => false,
+                'message' => 'Email already exists'
+            ];
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
         $userData = [
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'name' => $name,
+            'email' => $email,
             'password' => $hashedPassword,
-            'bio' => $data['bio'] ?? null,
-            'location' => $data['location'] ?? null
+            // IMPORTANT: do NOT accept role from the client
+            'role' => 'user'
         ];
 
-        $userId = $this->userDAO->create($userData);
-        
-        if ($userId) {
-            return ['success' => true, 'message' => 'User registered successfully', 'user_id' => $userId];
+        try {
+            $userId = $this->userDAO->create($userData);
+        } catch (\Throwable $e) {
+            error_log($e);
+            return [
+                'success' => false,
+                'message' => 'Registration failed'
+            ];
         }
-        
-        return ['success' => false, 'message' => 'Registration failed'];
+
+        if ($userId) {
+            return [
+                'success' => true,
+                'message' => 'User registered successfully',
+                'user_id' => (int)$userId
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Registration failed'
+        ];
     }
 
-    public function login($email, $password) {
-        $user = $this->userDAO->getByEmail($email);
-        
+    /* =========================
+       LOGIN (PUBLIC)
+    ========================== */
+    public function login(string $email, string $password): array {
+        $email = trim($email);
+
+        if ($email === '' || $password === '') {
+            return [
+                'success' => false,
+                'message' => 'Email and password are required'
+            ];
+        }
+
+        $user = $this->userDAO->findByEmail($email);
+
         if (!$user) {
-            return ['success' => false, 'message' => 'User not found'];
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
         }
 
         if (!password_verify($password, $user['password'])) {
-            return ['success' => false, 'message' => 'Invalid password'];
+            return [
+                'success' => false,
+                'message' => 'Invalid password'
+            ];
         }
 
-        $token = $this->authMiddleware->generateToken($user['id']);
-        
+        // JWT with ROLE (Milestone 4 requirement)
+        $token = $this->authMiddleware->generateToken(
+            (int)$user['id'],
+            (string)$user['role']
+        );
+
         return [
             'success' => true,
             'message' => 'Login successful',
             'token' => $token,
             'user' => [
-                'id' => $user['id'],
-                'name' => $user['name'],
-                'email' => $user['email']
+                'id' => (int)$user['id'],
+                'name' => $user['name'] ?? '',
+                'email' => $user['email'],
+                'role' => $user['role']
             ]
         ];
     }
 
-    public function getUserById($userId) {
-        $user = $this->userDAO->read($userId);
-        
+    /* =========================
+       GET USER BY ID
+    ========================== */
+    public function getUserById(int $userId): array {
+        $user = $this->userDAO->findById($userId);
+
         if (!$user) {
-            return ['success' => false, 'message' => 'User not found'];
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
         }
 
         unset($user['password']);
-        return ['success' => true, 'user' => $user];
+
+        return [
+            'success' => true,
+            'user' => $user
+        ];
     }
 
-    public function getAllUsers() {
-        $users = $this->userDAO->readAll();
-        
+    /* =========================
+       GET ALL USERS (ADMIN)
+    ========================== */
+    public function getAllUsers(): array {
+        $users = $this->userDAO->findAll();
+
         foreach ($users as &$user) {
             unset($user['password']);
         }
 
-        return ['success' => true, 'users' => $users];
+        return [
+            'success' => true,
+            'users' => $users
+        ];
     }
 
-    public function updateUser($userId, $data) {
-        $user = $this->userDAO->read($userId);
-        
+    /* =========================
+       UPDATE USER
+       - Owner can update: name/email/password
+       - Admin can also update: role
+    ========================== */
+    public function updateUser(int $userId, array $data, bool $isAdmin = false): array {
+        $user = $this->userDAO->findById($userId);
+
         if (!$user) {
-            return ['success' => false, 'message' => 'User not found'];
+            return [
+                'success' => false,
+                'message' => 'User not found'
+            ];
         }
 
-        if (isset($data['password'])) {
-            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        // Validate & normalize fields
+        $updateData = [];
+
+        if (array_key_exists('name', $data)) {
+            $name = trim((string)$data['name']);
+            if ($name === '') {
+                return ['success' => false, 'message' => 'Name cannot be empty'];
+            }
+            $updateData['name'] = $name;
         }
 
-        $success = $this->userDAO->update($userId, $data);
-        
-        if ($success) {
-            return ['success' => true, 'message' => 'User updated successfully'];
+        if (array_key_exists('email', $data)) {
+            $email = trim((string)$data['email']);
+            if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return ['success' => false, 'message' => 'Invalid email format'];
+            }
+
+            $existing = $this->userDAO->findByEmail($email);
+            if ($existing && (int)$existing['id'] !== (int)$userId) {
+                return ['success' => false, 'message' => 'Email already exists'];
+            }
+
+            $updateData['email'] = $email;
         }
 
-        return ['success' => false, 'message' => 'Update failed'];
+        if (!empty($data['password'])) {
+            $updateData['password'] = password_hash((string)$data['password'], PASSWORD_BCRYPT);
+        }
+
+        // Role updates are ADMIN-only
+        if ($isAdmin && array_key_exists('role', $data)) {
+            $role = (string)$data['role'];
+            if (!in_array($role, ['admin', 'user'], true)) {
+                return ['success' => false, 'message' => 'Invalid role'];
+            }
+            $updateData['role'] = $role;
+        }
+
+        if (empty($updateData)) {
+            return [
+                'success' => false,
+                'message' => 'No valid fields to update'
+            ];
+        }
+
+        try {
+            $updated = $this->userDAO->update($userId, $updateData);
+        } catch (\Throwable $e) {
+            error_log($e);
+            return [
+                'success' => false,
+                'message' => 'Update failed'
+            ];
+        }
+
+        if ($updated) {
+            return [
+                'success' => true,
+                'message' => 'User updated successfully'
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Update failed'
+        ];
     }
 
-    public function deleteUser($userId) {
-        $success = $this->userDAO->delete($userId);
-        
-        if ($success) {
-            return ['success' => true, 'message' => 'User deleted successfully'];
+    /* =========================
+       DELETE USER (ADMIN)
+    ========================== */
+    public function deleteUser(int $userId): array {
+        try {
+            $deleted = $this->userDAO->delete($userId);
+        } catch (\Throwable $e) {
+            error_log($e);
+            return [
+                'success' => false,
+                'message' => 'Delete failed'
+            ];
         }
 
-        return ['success' => false, 'message' => 'Delete failed'];
+        if ($deleted) {
+            return [
+                'success' => true,
+                'message' => 'User deleted successfully'
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Delete failed'
+        ];
     }
 }
-?>

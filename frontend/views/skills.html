@@ -1,9 +1,19 @@
-<section id="skills" class="section-padding">
+<section class="section-padding">
   <div class="container">
     <h2 class="section-title text-center mb-5">Technical Skills</h2>
-    <div class="row">
+    <!-- Dynamic container for logged-in user's skills -->
+    <div id="user-skills-container" class="d-none row"></div>
+    <!-- Static public content - Handan's Showcase Portfolio -->
+    <div id="static-skills-content">
+      <div class="alert alert-info text-center mb-4">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Showcase Portfolio:</strong> Skills below belong to Handan (site owner). 
+        <a href="#login" class="alert-link">Login</a> to see your own skills.
+      </div>
+      <div class="row">
 
       <div class="col-lg-6 mb-5">
+        <div class="bg-white border rounded-3 p-4 h-100">
         <h3 class="mb-4 text-center">
           <i class="fas fa-desktop me-2 text-primary"></i>Frontend
         </h3>
@@ -37,10 +47,12 @@
             <div class="skill-fill" data-width="95"></div>
           </div>
         </div>
+        </div>
       </div>
 
  
       <div class="col-lg-6 mb-5">
+        <div class="bg-white border rounded-3 p-4 h-100">
         <h3 class="mb-4 text-center">
           <i class="fas fa-server me-2 text-primary"></i>Backend
         </h3>
@@ -74,8 +86,11 @@
             <div class="skill-fill" data-width="70"></div>
           </div>
         </div>
+        </div>
       </div>
 
+      </div>
     </div>
+    <!-- End static-skills-content -->
   </div>
 </section>

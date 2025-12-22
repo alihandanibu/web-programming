@@ -1,24 +1,31 @@
 <?php
 namespace app\services;
 
-use app\dao\SkillDAO;
+require_once __DIR__ . '/../dao/SkillDAO.php';
 
 class SkillService {
     private $skillDAO;
 
     public function __construct() {
-        $this->skillDAO = new SkillDAO();
+        $this->skillDAO = new \SkillDAO();
     }
 
     public function addSkill($userId, $data) {
-        if (empty($data['name']) || empty($data['level'])) {
-            return ['success' => false, 'message' => 'Skill name and level are required'];
+        $proficiency = $data['proficiency'] ?? ($data['level'] ?? null);
+        if (empty($data['name']) || empty($proficiency)) {
+            return ['success' => false, 'message' => 'Skill name and proficiency are required'];
+        }
+
+        $proficiency = strtolower((string)$proficiency);
+        $allowed = ['beginner', 'intermediate', 'advanced', 'expert'];
+        if (!in_array($proficiency, $allowed, true)) {
+            return ['success' => false, 'message' => 'Invalid proficiency'];
         }
 
         $skillData = [
             'user_id' => $userId,
             'name' => $data['name'],
-            'level' => $data['level'],
+            'proficiency' => $proficiency,
             'category' => $data['category'] ?? 'general'
         ];
 
@@ -32,7 +39,7 @@ class SkillService {
     }
 
     public function getSkillsByUser($userId) {
-        $skills = $this->skillDAO->getByUserId($userId);
+        $skills = $this->skillDAO->findByUserId($userId);
         
         if (empty($skills)) {
             return ['success' => true, 'skills' => []];
@@ -42,13 +49,32 @@ class SkillService {
     }
 
     public function updateSkill($userId, $skillId, $data) {
-        $skill = $this->skillDAO->read($skillId);
+        $skill = $this->skillDAO->findById($skillId);
         
         if (!$skill || $skill['user_id'] != $userId) {
             return ['success' => false, 'message' => 'Skill not found'];
         }
 
-        $success = $this->skillDAO->update($skillId, $data);
+        if (isset($data['level']) && !isset($data['proficiency'])) {
+            $data['proficiency'] = $data['level'];
+            unset($data['level']);
+        }
+
+        if (isset($data['proficiency'])) {
+            $data['proficiency'] = strtolower((string)$data['proficiency']);
+            $allowed = ['beginner', 'intermediate', 'advanced', 'expert'];
+            if (!in_array($data['proficiency'], $allowed, true)) {
+                return ['success' => false, 'message' => 'Invalid proficiency'];
+            }
+        }
+
+        $allowedFields = ['name', 'proficiency', 'category'];
+        $updateData = array_intersect_key($data, array_flip($allowedFields));
+        if (empty($updateData)) {
+            return ['success' => false, 'message' => 'No valid fields to update'];
+        }
+
+        $success = $this->skillDAO->update($skillId, $updateData);
         
         if ($success) {
             return ['success' => true, 'message' => 'Skill updated successfully'];
@@ -58,7 +84,7 @@ class SkillService {
     }
 
     public function deleteSkill($userId, $skillId) {
-        $skill = $this->skillDAO->read($skillId);
+        $skill = $this->skillDAO->findById($skillId);
         
         if (!$skill || $skill['user_id'] != $userId) {
             return ['success' => false, 'message' => 'Skill not found'];

@@ -1,0 +1,26 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Local archives / backups
+*.zip
+*backup*
+*-backup/
+*-m3/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Local environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/

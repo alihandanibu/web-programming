@@ -1,0 +1,172 @@
+<section class="section-padding">
+    <div class="container">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 id="welcomeMessage">Welcome back!</h2>
+                <p class="text-muted">Personal Portfolio Dashboard</p>
+            </div>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user"></i> Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="fw-bold">Name:</label>
+                            <p id="userName" class="mb-0">Loading...</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Email:</label>
+                            <p id="userEmail" class="mb-0">Loading...</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Role:</label>
+                            <p id="userRole" class="mb-0"><span class="badge bg-secondary">Loading...</span></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Login Status:</label>
+                            <p class="mb-0"><span class="badge bg-success">Authenticated</span></p>
+                        </div>
+                        <div>
+                            <label class="fw-bold">Session Time:</label>
+                            <p id="sessionTime" class="mb-0">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role-Based Section -->
+            <div class="col-md-6">
+                <!-- Admin Tools (visible only for admin) -->
+                <div id="adminSection" class="card shadow-sm mb-3" style="display: none;">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="fas fa-tools"></i> Admin Tools</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>You have administrator privileges.</p>
+                        <a href="#admin" class="btn btn-danger w-100">Go to Admin Panel</a>
+                    </div>
+                </div>
+
+                <!-- Standard User Section -->
+                <div id="userSection" class="card shadow-sm mb-3" style="display: none;">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-circle"></i> User Access</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Standard user access granted.</p>
+                        <p class="text-muted small mb-0">Manage your portfolio content below.</p>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-cog"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="#projects" class="btn btn-outline-primary w-100 mb-2">View Projects</a>
+                        <a href="#skills" class="btn btn-outline-primary w-100 mb-2">View Skills</a>
+                        <a href="#contact" class="btn btn-outline-primary w-100 mb-2">Contact</a>
+                        <button id="logoutBtn" class="btn btn-outline-danger w-100">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills Management Section -->
+        <div class="row mt-4" id="skillsSection">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-lightbulb"></i> My Skills</h5>
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#addSkillForm">
+                            <i class="fas fa-plus"></i> Add Skill
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Add Skill Form (collapsed) -->
+                        <div class="collapse mb-3" id="addSkillForm">
+                            <form id="skillForm" class="row g-2 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label">Skill Name</label>
+                                    <input type="text" class="form-control" id="skillName" placeholder="e.g. JavaScript" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Proficiency</label>
+                                    <select class="form-select" id="skillProficiency" required>
+                                        <option value="beginner">Beginner</option>
+                                        <option value="intermediate" selected>Intermediate</option>
+                                        <option value="advanced">Advanced</option>
+                                        <option value="expert">Expert</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-success w-100">Add</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Skills List -->
+                        <div id="skillsList">
+                            <p class="text-muted text-center">Loading skills...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Management Section -->
+        <div class="row mt-4" id="projectsSection">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-folder-open"></i> My Projects</h5>
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#addProjectForm">
+                            <i class="fas fa-plus"></i> Add Project
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Add Project Form (collapsed) -->
+                        <div class="collapse mb-3" id="addProjectForm">
+                            <form id="projectForm" class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">Project Title</label>
+                                    <input type="text" class="form-control" id="projectTitle" placeholder="e.g. Portfolio Website" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">GitHub URL (optional)</label>
+                                    <input type="url" class="form-control" id="projectGithub" placeholder="https://github.com/...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Live URL (optional)</label>
+                                    <input type="url" class="form-control" id="projectUrl" placeholder="https://...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Description</label>
+                                    <input type="text" class="form-control" id="projectDesc" placeholder="Short description">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">Add Project</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Projects List -->
+                        <div id="projectsList">
+                            <p class="text-muted text-center">Loading projects...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="dashboardError" class="alert alert-danger mt-3" style="display: none;">
+            <p class="mb-0" id="errorMessage"></p>
+        </div>
+    </div>
+</section>

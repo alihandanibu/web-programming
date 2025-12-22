@@ -1,13 +1,13 @@
 <?php
 namespace app\services;
 
-use app\dao\ProjectDAO;
+require_once __DIR__ . '/../dao/ProjectDAO.php';
 
 class ProjectService {
     private $projectDAO;
 
     public function __construct() {
-        $this->projectDAO = new ProjectDAO();
+        $this->projectDAO = new \ProjectDAO();
     }
 
     public function addProject($userId, $data) {
@@ -19,10 +19,9 @@ class ProjectService {
             'user_id' => $userId,
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
-            'technologies' => $data['technologies'] ?? null,
-            'link' => $data['link'] ?? null,
-            'start_date' => $data['start_date'] ?? null,
-            'end_date' => $data['end_date'] ?? null
+            'image_url' => $data['image_url'] ?? null,
+            'project_url' => $data['project_url'] ?? ($data['link'] ?? null),
+            'github_url' => $data['github_url'] ?? null
         ];
 
         $projectId = $this->projectDAO->create($projectData);
@@ -35,7 +34,7 @@ class ProjectService {
     }
 
     public function getProjectsByUser($userId) {
-        $projects = $this->projectDAO->getByUserId($userId);
+        $projects = $this->projectDAO->findByUserId($userId);
         
         if (empty($projects)) {
             return ['success' => true, 'projects' => []];
@@ -45,13 +44,24 @@ class ProjectService {
     }
 
     public function updateProject($userId, $projectId, $data) {
-        $project = $this->projectDAO->read($projectId);
+        $project = $this->projectDAO->findById($projectId);
         
         if (!$project || $project['user_id'] != $userId) {
             return ['success' => false, 'message' => 'Project not found'];
         }
 
-        $success = $this->projectDAO->update($projectId, $data);
+        $allowed = ['title', 'description', 'image_url', 'project_url', 'github_url'];
+        $updateData = array_intersect_key($data, array_flip($allowed));
+        if (isset($updateData['link']) && !isset($updateData['project_url'])) {
+            $updateData['project_url'] = $updateData['link'];
+            unset($updateData['link']);
+        }
+
+        if (empty($updateData)) {
+            return ['success' => false, 'message' => 'No valid fields to update'];
+        }
+
+        $success = $this->projectDAO->update($projectId, $updateData);
         
         if ($success) {
             return ['success' => true, 'message' => 'Project updated successfully'];
@@ -61,7 +71,7 @@ class ProjectService {
     }
 
     public function deleteProject($userId, $projectId) {
-        $project = $this->projectDAO->read($projectId);
+        $project = $this->projectDAO->findById($projectId);
         
         if (!$project || $project['user_id'] != $userId) {
             return ['success' => false, 'message' => 'Project not found'];
