@@ -1,3 +1,8 @@
+// Redirect /docs to /v1/docs for compatibility
+Flight::route('/docs', function () {
+    header('Location: /v1/docs');
+    exit;
+});
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -110,13 +115,27 @@ require_once __DIR__ . '/routes/ProjectRoutes.php';
 require_once __DIR__ . '/routes/ContactRoutes.php';
 require_once __DIR__ . '/routes/SystemRoutes.php';
 
-Flight::route('/docs', function () use ($baseUrl) {
-    $target = rtrim($baseUrl, '/') . '/public/v1/docs/';
-    if ($target === '/public/v1/docs/') {
-        $target = '/public/v1/docs/';
+
+// Serve Swagger UI for /v1/docs and /v1/docs/
+Flight::route('/v1/docs', function () {
+    $docsIndex = __DIR__ . '/public/v1/docs/index.html';
+    if (file_exists($docsIndex)) {
+        header('Content-Type: text/html; charset=utf-8');
+        readfile($docsIndex);
+        exit;
+    } else {
+        Flight::json(['success' => false, 'error' => 'Swagger UI not found'], 404);
     }
-    header('Location: ' . $target);
-    exit;
+});
+Flight::route('/v1/docs/', function () {
+    $docsIndex = __DIR__ . '/public/v1/docs/index.html';
+    if (file_exists($docsIndex)) {
+        header('Content-Type: text/html; charset=utf-8');
+        readfile($docsIndex);
+        exit;
+    } else {
+        Flight::json(['success' => false, 'error' => 'Swagger UI not found'], 404);
+    }
 });
 
 Flight::route('/api/docs.json', function () {
