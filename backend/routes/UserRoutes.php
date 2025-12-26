@@ -69,8 +69,10 @@ Flight::route('GET /users/@id', function ($id) {
 
     $currentUser = Flight::get('user');
 
+    $currentRole = strtolower(trim((string)($currentUser['role'] ?? '')));
+
     if (
-        $currentUser['role'] !== 'admin' &&
+        $currentRole !== 'admin' &&
         (int)$currentUser['user_id'] !== (int)$id
     ) {
         Flight::json(['error' => 'Forbidden'], 403);
@@ -125,8 +127,10 @@ Flight::put('/users/@id', function ($id) {
 
     $currentUser = Flight::get('user');
 
+    $currentRole = strtolower(trim((string)($currentUser['role'] ?? '')));
+
     if (
-        $currentUser['role'] !== 'admin' &&
+        $currentRole !== 'admin' &&
         (int)$currentUser['user_id'] !== (int)$id
     ) {
         Flight::json(['error' => 'Forbidden'], 403);
@@ -135,7 +139,7 @@ Flight::put('/users/@id', function ($id) {
 
     $data = Flight::request()->data->getData();
     $userService = Flight::UserService();
-    $isAdmin = ($currentUser['role'] === 'admin');
+    $isAdmin = ($currentRole === 'admin');
 
     // Prevent role tampering for normal users
     if (!$isAdmin) {

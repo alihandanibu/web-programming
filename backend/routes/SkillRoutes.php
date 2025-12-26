@@ -17,7 +17,8 @@ Flight::route('GET /users/@userId/skills', function ($userId) {
     $auth->requireAuth();
 
     $currentUser = Flight::get('user');
-    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+    $currentRole = strtolower(trim((string)($currentUser['role'] ?? '')));
+    if ($currentRole !== 'admin' && $currentUser['user_id'] != $userId) {
         Flight::json(['error' => 'Forbidden'], 403);
         return;
     }
@@ -41,7 +42,8 @@ Flight::post('/users/@userId/skills', function ($userId) {
     $auth->requireAuth();
 
     $currentUser = Flight::get('user');
-    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+    $currentRole = strtolower(trim((string)($currentUser['role'] ?? '')));
+    if ($currentRole !== 'admin' && $currentUser['user_id'] != $userId) {
         Flight::json(['error' => 'Forbidden'], 403);
         return;
     }
@@ -67,7 +69,8 @@ Flight::put('/users/@userId/skills/@skillId', function ($userId, $skillId) {
     $auth->requireAuth();
 
     $currentUser = Flight::get('user');
-    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+    $currentRole = strtolower(trim((string)($currentUser['role'] ?? '')));
+    if ($currentRole !== 'admin' && $currentUser['user_id'] != $userId) {
         Flight::json(['error' => 'Forbidden'], 403);
         return;
     }
@@ -93,7 +96,8 @@ Flight::delete('/users/@userId/skills/@skillId', function ($userId, $skillId) {
     $auth->requireAuth();
 
     $currentUser = Flight::get('user');
-    if ($currentUser['role'] !== 'admin' && $currentUser['user_id'] != $userId) {
+    $currentRole = strtolower(trim((string)($currentUser['role'] ?? '')));
+    if ($currentRole !== 'admin' && $currentUser['user_id'] != $userId) {
         Flight::json(['error' => 'Forbidden'], 403);
         return;
     }

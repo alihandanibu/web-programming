@@ -1,16 +1,26 @@
+<?php
+// Optional deployment override: set API_BASE in the environment and it will be injected
+// into a <meta name="api-base"> tag (used by frontend/js/api.js).
+$api_base = getenv('API_BASE') ?: '';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Handan Portfolio - IT Student</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Handan Portfolio - IT Student</title>
 
-    <base href="/mojnoviprojekat/web-programming/frontend/">
+<base href="./">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="css/spapp.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+<?php if (is_string($api_base) && trim($api_base) !== ''): ?>
+    <meta name="api-base" content="<?php echo htmlspecialchars(trim($api_base), ENT_QUOTES, 'UTF-8'); ?>">
+<?php endif; ?>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="css/spapp.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -34,25 +44,26 @@
                     <li class="nav-item"><a class="nav-link" href="#register">Register</a></li>
                     <li class="nav-item" id="dashboardNav" style="display:none;"><a class="nav-link" href="#dashboard">Dashboard</a></li>
                     <li class="nav-item" id="adminNav" style="display:none;"><a class="nav-link" href="#admin">Admin</a></li>
+                    <li class="nav-item" id="logoutNav" style="display:none;"><a class="nav-link" href="#" id="navLogoutBtn"><i class="fas fa-sign-out-alt me-1"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <main id="spapp" class="container" style="padding-top: 90px;">
-        <?php include 'views/home.html'; ?>
-        <?php include 'views/about.html'; ?>
-        <?php include 'views/projects.html'; ?>
-        <?php include 'views/skills.html'; ?>
-        <?php include 'views/contact.html'; ?>
-        <?php include 'views/login.html'; ?>
-        <?php include 'views/register.html'; ?>
-        <?php include 'views/dashboard.html'; ?>
-        <?php include 'views/admin.html'; ?>
-        <?php include 'views/error_404.html'; ?>
+        <section id="home" class="spa-view"></section>
+        <section id="about" class="spa-view"></section>
+        <section id="projects" class="spa-view"></section>
+        <section id="skills" class="spa-view"></section>
+        <section id="contact" class="spa-view"></section>
+        <section id="login" class="spa-view"></section>
+        <section id="register" class="spa-view"></section>
+        <section id="dashboard" class="spa-view"></section>
+        <section id="admin" class="spa-view"></section>
+        <section id="error_404" class="spa-view"></section>
     </main>
 
-    <footer class="bg-dark text-white text-center py-4 mt-5">
+    <footer class="bg-dark text-white text-center py-4">
         <div class="container">
             <p>&copy; 2025 Handan Portfolio. All rights reserved.</p>
             <div class="social-links">
@@ -70,13 +81,23 @@
     </footer>
 
     <script>
-        if (!location.hash) {
-            location.replace(location.pathname + "#home");
-        }
+    if (!location.hash) {
+        location.replace(location.pathname + "#home");
+    }
     </script>
 
     <!-- Core libs -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- jQuery Validation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <!-- BlockUI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+    <!-- Toastr CSS & JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/load-override.js"></script>
     <script src="js/spapp.min.js"></script>
 
     <!-- API LAYER (OBAVEZNO PRIJE APP-A) -->
@@ -85,14 +106,13 @@
     <!-- SPA / ROUTING -->
     <script src="js/app.js"></script>
 
-    <!-- PAGE LOGIC -->
-    <script src="js/dashboard.js"></script>
-    <script src="js/admin.js"></script>
-    <script src="js/features.js"></script>
+    <!-- PAGE LOGIC (ES Modules) -->
+    <script type="module" src="js/dashboard.js"></script>
+    <script type="module" src="js/admin.js"></script>
+    <script type="module" src="js/features.js"></script>
 
     <!-- UI -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>

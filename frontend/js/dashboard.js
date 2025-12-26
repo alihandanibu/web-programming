@@ -85,14 +85,16 @@ function loadDashboard() {
 
                 const userRoleEl = document.getElementById('userRole');
                 if (userRoleEl) {
-                    const roleClass = user.role === 'admin' ? 'bg-danger' : 'bg-info';
-                    userRoleEl.innerHTML = `<span class="badge ${roleClass}">${user.role.toUpperCase()}</span>`;
+                    const role = String(user.role || '').toLowerCase();
+                    const roleClass = role === 'admin' ? 'bg-danger' : 'bg-info';
+                    userRoleEl.innerHTML = `<span class="badge ${roleClass}">${role.toUpperCase()}</span>`;
                 }
 
                 const adminSection = document.getElementById('adminSection');
                 const userSection = document.getElementById('userSection');
 
-                if (user.role === 'admin') {
+                const isAdmin = String(user.role || '').toLowerCase() === 'admin';
+                if (isAdmin) {
                     if (adminSection) adminSection.style.display = 'block';
                     if (userSection) userSection.style.display = 'none';
                 } else {
@@ -141,10 +143,31 @@ function loadDashboardSkills(userId) {
                 return;
             }
 
-            let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0"><thead><tr><th>Skill</th><th>Proficiency</th><th>Action</th></tr></thead><tbody>';
+            // Group skills by category
+            const grouped = { Frontend: [], Backend: [], Database: [], DevOps: [], Other: [] };
             skills.forEach(skill => {
+                const cat = skill.category || 'Other';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(skill);
+            });
+
+            let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0"><thead><tr><th>Skill</th><th>Category</th><th>Proficiency</th><th>Action</th></tr></thead><tbody>';
+            skills.forEach(skill => {
+                const categoryIcons = {
+                    'Frontend': '🎨',
+                    'Backend': '⚙️',
+                    'Database': '🗄️',
+                    'DevOps': '🚀',
+                    'Other': '📦'
+                };
+                const catIcon = categoryIcons[skill.category] || '📦';
+                const catBadgeClass = skill.category === 'Frontend' ? 'bg-info' :
+                    skill.category === 'Backend' ? 'bg-success' :
+                        skill.category === 'Database' ? 'bg-warning text-dark' :
+                            skill.category === 'DevOps' ? 'bg-danger' : 'bg-secondary';
                 html += `<tr>
                     <td>${skill.name}</td>
+                    <td><span class="badge ${catBadgeClass}">${catIcon} ${skill.category || 'Other'}</span></td>
                     <td><span class="badge bg-secondary">${skill.proficiency}</span></td>
                     <td><button class="btn btn-sm btn-outline-danger delete-skill-btn" data-id="${skill.id}"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
@@ -170,14 +193,37 @@ function loadDashboardProjects(userId) {
                 return;
             }
 
-            let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0"><thead><tr><th>Title</th><th>Description</th><th>Links</th><th>Action</th></tr></thead><tbody>';
+            let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0"><thead><tr><th>Title</th><th>Technologies</th><th>Links</th><th>Action</th></tr></thead><tbody>';
             projects.forEach(project => {
                 const links = [];
                 if (project.github_url) links.push(`<a href="${project.github_url}" target="_blank" class="me-1"><i class="fab fa-github"></i></a>`);
                 if (project.project_url) links.push(`<a href="${project.project_url}" target="_blank"><i class="fas fa-external-link-alt"></i></a>`);
+
+                // Parse technologies
+                let techBadges = '-';
+                if (project.technologies) {
+                    const techs = project.technologies.split(',').map(t => t.trim()).filter(t => t);
+                    const techColors = {
+                        'PHP': 'bg-primary',
+                        'MySQL': 'bg-info',
+                        'JavaScript': 'bg-warning text-dark',
+                        'HTML/CSS': 'bg-danger',
+                        'React': 'bg-info',
+                        'Node.js': 'bg-success',
+                        'Python': 'bg-primary',
+                        'Bootstrap': 'bg-purple',
+                        'API': 'bg-secondary'
+                    };
+                    techBadges = techs.map(t => {
+                        const colorClass = techColors[t] || 'bg-secondary';
+                        const style = t === 'Bootstrap' ? 'style="background-color:#7952b3!important"' : '';
+                        return `<span class="badge ${colorClass} me-1" ${style}>${t}</span>`;
+                    }).join('');
+                }
+
                 html += `<tr>
-                    <td>${project.title}</td>
-                    <td class="text-truncate" style="max-width:150px;">${project.description || '-'}</td>
+                    <td><strong>${project.title}</strong><br><small class="text-muted">${project.description || ''}</small></td>
+                    <td>${techBadges}</td>
                     <td>${links.join('') || '-'}</td>
                     <td><button class="btn btn-sm btn-outline-danger delete-project-btn" data-id="${project.id}"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
@@ -198,19 +244,30 @@ document.addEventListener('submit', function (e) {
 
         const name = document.getElementById('skillName').value.trim();
         const proficiency = document.getElementById('skillProficiency').value;
+        const category = document.getElementById('skillCategory').value;
 
         if (!name) return;
 
-        apiAddSkill(dashboardUserId, { name, proficiency })
+        // Block UI if available
+        if (window.$ && $.blockUI) $.blockUI({ message: '<h3>Adding skill...</h3>' });
+
+        apiAddSkill(dashboardUserId, { name, proficiency, category })
             .then(res => {
+                if (window.$ && $.unblockUI) $.unblockUI();
                 if (res.success) {
+                    if (window.toastr) toastr.success('Skill added successfully!');
                     document.getElementById('skillForm').reset();
                     loadDashboardSkills(dashboardUserId);
                 } else {
-                    alert(res.message || 'Failed to add skill');
+                    if (window.toastr) toastr.error(res.message || 'Failed to add skill');
+                    else alert(res.message || 'Failed to add skill');
                 }
             })
-            .catch(() => alert('Failed to add skill'));
+            .catch(() => {
+                if (window.$ && $.unblockUI) $.unblockUI();
+                if (window.toastr) toastr.error('Failed to add skill');
+                else alert('Failed to add skill');
+            });
     }
 });
 
@@ -225,18 +282,34 @@ document.addEventListener('submit', function (e) {
         const github_url = document.getElementById('projectGithub').value.trim();
         const project_url = document.getElementById('projectUrl').value.trim();
 
+        // Collect selected technologies
+        const techCheckboxes = document.querySelectorAll('.tech-checkbox:checked');
+        const technologies = Array.from(techCheckboxes).map(cb => cb.value).join(',');
+
         if (!title) return;
 
-        apiAddProject(dashboardUserId, { title, description, github_url, project_url })
+        // Block UI if available
+        if (window.$ && $.blockUI) $.blockUI({ message: '<h3>Adding project...</h3>' });
+
+        apiAddProject(dashboardUserId, { title, description, github_url, project_url, technologies })
             .then(res => {
+                if (window.$ && $.unblockUI) $.unblockUI();
                 if (res.success) {
+                    if (window.toastr) toastr.success('Project added successfully!');
                     document.getElementById('projectForm').reset();
+                    // Uncheck all tech checkboxes
+                    document.querySelectorAll('.tech-checkbox').forEach(cb => cb.checked = false);
                     loadDashboardProjects(dashboardUserId);
                 } else {
-                    alert(res.message || 'Failed to add project');
+                    if (window.toastr) toastr.error(res.message || 'Failed to add project');
+                    else alert(res.message || 'Failed to add project');
                 }
             })
-            .catch(() => alert('Failed to add project'));
+            .catch(() => {
+                if (window.$ && $.unblockUI) $.unblockUI();
+                if (window.toastr) toastr.error('Failed to add project');
+                else alert('Failed to add project');
+            });
     }
 });
 
@@ -248,15 +321,24 @@ document.addEventListener('click', function (e) {
     const skillId = btn.dataset.id;
     if (!confirm('Delete this skill?')) return;
 
+    if (window.$ && $.blockUI) $.blockUI({ message: '<h3>Deleting...</h3>' });
+
     apiDeleteSkill(dashboardUserId, skillId)
         .then(res => {
+            if (window.$ && $.unblockUI) $.unblockUI();
             if (res.success) {
+                if (window.toastr) toastr.success('Skill deleted!');
                 loadDashboardSkills(dashboardUserId);
             } else {
-                alert(res.message || 'Failed to delete skill');
+                if (window.toastr) toastr.error(res.message || 'Failed to delete skill');
+                else alert(res.message || 'Failed to delete skill');
             }
         })
-        .catch(() => alert('Failed to delete skill'));
+        .catch(() => {
+            if (window.$ && $.unblockUI) $.unblockUI();
+            if (window.toastr) toastr.error('Failed to delete skill');
+            else alert('Failed to delete skill');
+        });
 });
 
 // Delete project handler
@@ -267,13 +349,22 @@ document.addEventListener('click', function (e) {
     const projectId = btn.dataset.id;
     if (!confirm('Delete this project?')) return;
 
+    if (window.$ && $.blockUI) $.blockUI({ message: '<h3>Deleting...</h3>' });
+
     apiDeleteProject(dashboardUserId, projectId)
         .then(res => {
+            if (window.$ && $.unblockUI) $.unblockUI();
             if (res.success) {
+                if (window.toastr) toastr.success('Project deleted!');
                 loadDashboardProjects(dashboardUserId);
             } else {
-                alert(res.message || 'Failed to delete project');
+                if (window.toastr) toastr.error(res.message || 'Failed to delete project');
+                else alert(res.message || 'Failed to delete project');
             }
         })
-        .catch(() => alert('Failed to delete project'));
+        .catch(() => {
+            if (window.$ && $.unblockUI) $.unblockUI();
+            if (window.toastr) toastr.error('Failed to delete project');
+            else alert('Failed to delete project');
+        });
 });

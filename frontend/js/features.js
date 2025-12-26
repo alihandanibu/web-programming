@@ -26,16 +26,55 @@ function loadProjects() {
         return;
       }
 
-      projects.forEach(project => {
+      // Project icons based on keywords
+      const getProjectIcon = (title, desc) => {
+        const text = ((title || '') + ' ' + (desc || '')).toLowerCase();
+        if (text.includes('web') || text.includes('website')) return 'fa-globe';
+        if (text.includes('mobile') || text.includes('app')) return 'fa-mobile-alt';
+        if (text.includes('api') || text.includes('backend')) return 'fa-server';
+        if (text.includes('bot') || text.includes('chat')) return 'fa-robot';
+        if (text.includes('database') || text.includes('sql')) return 'fa-database';
+        if (text.includes('ai') || text.includes('machine')) return 'fa-brain';
+        if (text.includes('game')) return 'fa-gamepad';
+        return 'fa-code';
+      };
+
+      // Parse technologies from description or technologies field
+      const getTechnologies = (project) => {
+        if (project.technologies) {
+          return project.technologies.split(',').map(t => t.trim()).filter(t => t);
+        }
+        // Try to extract from description
+        const techKeywords = ['PHP', 'JavaScript', 'Python', 'React', 'Node.js', 'MySQL', 'MongoDB', 'Bootstrap', 'CSS', 'HTML', 'Vue', 'Angular', 'Django', 'Flask', 'Java', 'C++', 'C#'];
+        const desc = (project.description || '').toLowerCase();
+        return techKeywords.filter(t => desc.includes(t.toLowerCase()));
+      };
+
+      const badgeColors = ['bg-primary', 'bg-secondary', 'bg-success', 'bg-info', 'bg-warning text-dark', 'bg-danger'];
+
+      projects.forEach((project, index) => {
+        const icon = getProjectIcon(project.title, project.description);
+        const technologies = getTechnologies(project);
+        const animationDelay = Math.min(index + 1, 6);
+
+        let techBadges = '';
+        technologies.slice(0, 4).forEach((tech, i) => {
+          techBadges += `<span class="badge ${badgeColors[i % badgeColors.length]} me-1">${tech}</span>`;
+        });
+
         $container.append(`
-          <div class="col-lg-4 col-md-6">
-            <div class="card card-hover h-100">
-              <div class="card-body">
-                <h5 class="card-title">${project.title}</h5>
-                <p class="card-text">${project.description || 'No description'}</p>
-                <div class="project-links d-flex gap-2 flex-wrap">
+          <div class="col-lg-4 col-md-6 animate-fadeInUp animation-delay-${animationDelay}">
+            <div class="card user-project-card h-100 animate-pulse">
+              <div class="card-body p-4">
+                <div class="project-icon mb-3">
+                  <i class="fas ${icon}"></i>
+                </div>
+                <h5 class="card-title fw-bold">${project.title}</h5>
+                <p class="card-text text-muted">${project.description || 'No description provided.'}</p>
+                ${techBadges ? `<div class="technologies mb-3">${techBadges}</div>` : ''}
+                <div class="project-links d-flex gap-2 flex-wrap mt-auto">
                   ${project.github_url ? `<a href="${project.github_url}" class="btn btn-sm btn-outline-primary" target="_blank"><i class="fab fa-github me-1"></i>GitHub</a>` : ''}
-                  ${(project.project_url || project.link) ? `<a href="${project.project_url || project.link}" class="btn btn-sm btn-outline-secondary" target="_blank"><i class="fas fa-external-link-alt me-1"></i>Live</a>` : ''}
+                  ${(project.project_url || project.link) ? `<a href="${project.project_url || project.link}" class="btn btn-sm btn-outline-success" target="_blank"><i class="fas fa-external-link-alt me-1"></i>Live Demo</a>` : ''}
                 </div>
               </div>
             </div>
@@ -87,22 +126,102 @@ function loadSkills() {
         return 60;
       };
 
+      // Categorize skills
+      const frontendKeywords = ['html', 'css', 'javascript', 'react', 'vue', 'angular', 'bootstrap', 'tailwind', 'sass', 'scss', 'jquery', 'typescript', 'frontend', 'front-end'];
+      const backendKeywords = ['php', 'node', 'python', 'java', 'c#', 'c++', 'ruby', 'go', 'rust', 'mysql', 'postgresql', 'mongodb', 'sql', 'django', 'flask', 'laravel', 'express', 'backend', 'back-end', 'api', 'database'];
+
+      const categorizeSkill = (name, category) => {
+        const n = (name || '').toLowerCase();
+        const c = (category || '').toLowerCase();
+
+        if (c === 'frontend' || c === 'front-end') return 'frontend';
+        if (c === 'backend' || c === 'back-end') return 'backend';
+
+        if (frontendKeywords.some(k => n.includes(k))) return 'frontend';
+        if (backendKeywords.some(k => n.includes(k))) return 'backend';
+        return 'other';
+      };
+
+      const frontend = [];
+      const backend = [];
+      const other = [];
+
       skills.forEach(skill => {
-        const width = proficiencyToWidth(skill.proficiency);
-        $container.append(`
-          <div class="col-lg-6 mb-3">
-            <div class="bg-white border rounded-3 p-3">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong>${skill.name}</strong>
-                <small class="text-muted text-uppercase">${skill.proficiency}</small>
+        const cat = categorizeSkill(skill.name, skill.category);
+        if (cat === 'frontend') frontend.push(skill);
+        else if (cat === 'backend') backend.push(skill);
+        else other.push(skill);
+      });
+
+      const renderSkillCategory = (title, icon, skillsArr, animationClass, delayStart) => {
+        if (skillsArr.length === 0) return '';
+
+        let html = `
+          <div class="col-lg-6 mb-4 ${animationClass} animation-delay-${delayStart}">
+            <div class="user-skill-card p-4 h-100">
+              <div class="skill-category-header">
+                <i class="fas ${icon}"></i>
+                <h3 class="mb-0">${title}</h3>
+              </div>
+        `;
+
+        skillsArr.forEach((skill, i) => {
+          const width = proficiencyToWidth(skill.proficiency);
+          const profLabel = skill.proficiency ? skill.proficiency.charAt(0).toUpperCase() + skill.proficiency.slice(1).toLowerCase() : '';
+          html += `
+            <div class="user-skill-item">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="fw-semibold">${skill.name}</span>
+                <span class="text-muted">${width}%</span>
               </div>
               <div class="skill-track">
                 <div class="skill-fill" data-width="${width}"></div>
               </div>
             </div>
-          </div>
-        `);
-      });
+          `;
+        });
+
+        html += `</div></div>`;
+        return html;
+      };
+
+      // Build HTML
+      let html = '<div class="row">';
+      html += renderSkillCategory('Frontend', 'fa-desktop', frontend, 'animate-slideInLeft', 1);
+      html += renderSkillCategory('Backend', 'fa-server', backend, 'animate-slideInRight', 2);
+      html += '</div>';
+
+      if (other.length > 0) {
+        html += '<div class="row">';
+        html += `
+          <div class="col-12 mb-4 animate-fadeInUp animation-delay-3">
+            <div class="user-skill-card p-4">
+              <div class="skill-category-header">
+                <i class="fas fa-tools"></i>
+                <h3 class="mb-0">Other Skills</h3>
+              </div>
+              <div class="row">
+        `;
+        other.forEach(skill => {
+          const width = proficiencyToWidth(skill.proficiency);
+          html += `
+            <div class="col-md-6">
+              <div class="user-skill-item">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="fw-semibold">${skill.name}</span>
+                  <span class="text-muted">${width}%</span>
+                </div>
+                <div class="skill-track">
+                  <div class="skill-fill" data-width="${width}"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div></div></div></div>';
+      }
+
+      $container.html(html);
 
       // Animate skill bars
       $('#user-skills-container .skill-fill').css('width', '0%');
@@ -110,7 +229,7 @@ function loadSkills() {
         $('#user-skills-container .skill-fill').each(function () {
           $(this).css('width', $(this).data('width') + '%');
         });
-      }, 50);
+      }, 300);
     })
     .catch(() => {
       // On error, fallback to static

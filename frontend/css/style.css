@@ -8,9 +8,20 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding-top: 76px;
+    padding-top: 56px;
     background: var(--bg);
     color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
 }
 
 /* SPA: show only active section (safe fallback)
@@ -30,7 +41,7 @@ body.spa-ready .spa-view.is-active {
 .hero-section {
     background: linear-gradient(135deg, var(--brand-prim), var(--brand-sec));
     color: #fff;
-    padding: 100px 0;
+    padding: 15px 0;
     text-align: center;
 }
 
@@ -40,13 +51,39 @@ body.spa-ready .spa-view.is-active {
 }
 
 .section-padding {
-    padding: 60px 0;
+    padding: 5px 0;
 }
 
 .card {
     border: none;
     box-shadow: none;
     background: transparent;
+}
+
+/* Restore card surfaces on dynamic app pages (Dashboard/Admin) */
+#dashboard .card,
+#admin .card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
+}
+
+/* Icon badges for higher contrast */
+.icon-badge {
+    width: 54px;
+    height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--brand-prim), var(--brand-sec));
+    border-radius: 14px;
+    color: #fff;
+}
+
+.icon-badge i {
+    color: inherit;
+    font-size: 1.35rem;
 }
 
 .btn-primary {
@@ -84,6 +121,30 @@ body.spa-ready .spa-view.is-active {
     background: #fff;
     border: 1px solid #e9ecef;
     border-radius: 12px;
+}
+
+/* About page cards */
+#about .about-card,
+#about .about-profile {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
+}
+
+#about .about-mini-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+}
+
+#about .about-avatar {
+    width: 170px;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 999px;
+    border: 4px solid #fff;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .10);
 }
 
 /* Projects: emphasize cards without changing global card styling */
@@ -200,4 +261,204 @@ body.spa-ready .spa-view.is-active {
     border: 1px solid #e9ecef;
     border-radius: 12px;
     padding: 18px;
+}
+
+/* Admin compact buttons */
+.btn-xs {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+}
+
+/* Animations for logged-in users */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.animate-slideInLeft {
+    animation: slideInLeft 0.6s ease forwards;
+}
+
+.animate-slideInRight {
+    animation: slideInRight 0.6s ease forwards;
+}
+
+.animate-pulse:hover {
+    animation: pulse 0.3s ease;
+}
+
+/* Staggered animation delays */
+.animation-delay-1 {
+    animation-delay: 0.1s;
+    opacity: 0;
+}
+
+.animation-delay-2 {
+    animation-delay: 0.2s;
+    opacity: 0;
+}
+
+.animation-delay-3 {
+    animation-delay: 0.3s;
+    opacity: 0;
+}
+
+.animation-delay-4 {
+    animation-delay: 0.4s;
+    opacity: 0;
+}
+
+.animation-delay-5 {
+    animation-delay: 0.5s;
+    opacity: 0;
+}
+
+.animation-delay-6 {
+    animation-delay: 0.6s;
+    opacity: 0;
+}
+
+/* User content card styles (same as static) */
+.user-project-card,
+.user-skill-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.user-project-card:hover,
+.user-skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .12);
+}
+
+/* Project icon styling */
+.project-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--brand-prim), var(--brand-sec));
+    border-radius: 12px;
+    color: #fff;
+}
+
+.project-icon i {
+    color: inherit !important;
+    font-size: 28px;
+}
+
+/* Category headers for skills */
+.skill-category-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--brand-prim);
+}
+
+.skill-category-header i {
+    font-size: 1.5rem;
+    color: var(--brand-prim);
+}
+
+/* Skill item styling for user content */
+.user-skill-item {
+    margin-bottom: 1rem;
+}
+
+.user-skill-item .skill-track {
+    height: 8px;
+}
+
+/* Tech checkbox styling */
+#techCheckboxes .form-check {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#techCheckboxes .form-check-input {
+    margin-right: 0.25rem;
+}
+
+#techCheckboxes .form-check-input:checked+.form-check-label .badge {
+    box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.3);
+    transform: scale(1.05);
+}
+
+#techCheckboxes .badge {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#techCheckboxes .badge:hover {
+    transform: scale(1.05);
+}
+
+/* Project icon styling */
+.project-icon-display {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand-prim), var(--brand-sec));
+    color: white;
+    font-size: 1.5rem;
 }

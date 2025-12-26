@@ -93,20 +93,30 @@
                         <!-- Add Skill Form (collapsed) -->
                         <div class="collapse mb-3" id="addSkillForm">
                             <form id="skillForm" class="row g-2 align-items-end">
-                                <div class="col-md-5">
-                                    <label class="form-label">Skill Name</label>
-                                    <input type="text" class="form-control" id="skillName" placeholder="e.g. JavaScript" required>
-                                </div>
                                 <div class="col-md-4">
+                                    <label class="form-label">Skill Name</label>
+                                    <input type="text" class="form-control" id="skillName" name="name" placeholder="e.g. JavaScript" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" id="skillCategory" name="category" required>
+                                        <option value="Frontend">🎨 Frontend</option>
+                                        <option value="Backend">⚙️ Backend</option>
+                                        <option value="Database">🗄️ Database</option>
+                                        <option value="DevOps">🚀 DevOps</option>
+                                        <option value="Other">📦 Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
                                     <label class="form-label">Proficiency</label>
-                                    <select class="form-select" id="skillProficiency" required>
+                                    <select class="form-select" id="skillProficiency" name="proficiency" required>
                                         <option value="beginner">Beginner</option>
                                         <option value="intermediate" selected>Intermediate</option>
                                         <option value="advanced">Advanced</option>
                                         <option value="expert">Expert</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <button type="submit" class="btn btn-success w-100">Add</button>
                                 </div>
                             </form>
@@ -136,22 +146,65 @@
                             <form id="projectForm" class="row g-2">
                                 <div class="col-md-6">
                                     <label class="form-label">Project Title</label>
-                                    <input type="text" class="form-control" id="projectTitle" placeholder="e.g. Portfolio Website" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">GitHub URL (optional)</label>
-                                    <input type="url" class="form-control" id="projectGithub" placeholder="https://github.com/...">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Live URL (optional)</label>
-                                    <input type="url" class="form-control" id="projectUrl" placeholder="https://...">
+                                    <input type="text" class="form-control" id="projectTitle" name="title" placeholder="e.g. Portfolio Website" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Description</label>
-                                    <input type="text" class="form-control" id="projectDesc" placeholder="Short description">
+                                    <input type="text" class="form-control" id="projectDesc" name="description" placeholder="Short description">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Technologies (select all that apply)</label>
+                                    <div class="d-flex flex-wrap gap-2" id="techCheckboxes">
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="PHP" id="techPHP">
+                                            <label class="form-check-label" for="techPHP"><span class="badge bg-primary">PHP</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="MySQL" id="techMySQL">
+                                            <label class="form-check-label" for="techMySQL"><span class="badge bg-info">MySQL</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="JavaScript" id="techJS">
+                                            <label class="form-check-label" for="techJS"><span class="badge bg-warning text-dark">JavaScript</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="HTML/CSS" id="techHTML">
+                                            <label class="form-check-label" for="techHTML"><span class="badge bg-danger">HTML/CSS</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="React" id="techReact">
+                                            <label class="form-check-label" for="techReact"><span class="badge bg-info">React</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="Node.js" id="techNode">
+                                            <label class="form-check-label" for="techNode"><span class="badge bg-success">Node.js</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="Python" id="techPython">
+                                            <label class="form-check-label" for="techPython"><span class="badge bg-primary">Python</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="Bootstrap" id="techBootstrap">
+                                            <label class="form-check-label" for="techBootstrap"><span class="badge bg-purple" style="background-color:#7952b3!important">Bootstrap</span></label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tech-checkbox" type="checkbox" value="API" id="techAPI">
+                                            <label class="form-check-label" for="techAPI"><span class="badge bg-secondary">REST API</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">GitHub URL (optional)</label>
+                                    <input type="url" class="form-control" id="projectGithub" name="github_url" placeholder="https://github.com/...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Live URL (optional)</label>
+                                    <input type="url" class="form-control" id="projectUrl" name="project_url" placeholder="https://...">
                                 </div>
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">Add Project</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus me-1"></i> Add Project
+                                    </button>
                                 </div>
                             </form>
                         </div>

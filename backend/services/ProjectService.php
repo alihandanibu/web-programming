@@ -19,6 +19,7 @@ class ProjectService {
             'user_id' => $userId,
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
+            'technologies' => $data['technologies'] ?? null,
             'image_url' => $data['image_url'] ?? null,
             'project_url' => $data['project_url'] ?? ($data['link'] ?? null),
             'github_url' => $data['github_url'] ?? null
@@ -50,7 +51,7 @@ class ProjectService {
             return ['success' => false, 'message' => 'Project not found'];
         }
 
-        $allowed = ['title', 'description', 'image_url', 'project_url', 'github_url'];
+        $allowed = ['title', 'description', 'technologies', 'image_url', 'project_url', 'github_url'];
         $updateData = array_intersect_key($data, array_flip($allowed));
         if (isset($updateData['link']) && !isset($updateData['project_url'])) {
             $updateData['project_url'] = $updateData['link'];

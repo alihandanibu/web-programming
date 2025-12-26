@@ -1,5 +1,15 @@
 $(document).ready(function () {
 
+  // Initialize toastr options
+  if (window.toastr) {
+    toastr.options = {
+      closeButton: true,
+      progressBar: true,
+      positionClass: 'toast-top-right',
+      timeOut: 3000
+    };
+  }
+
   function getUser() {
     const u = localStorage.getItem('user');
     return u ? JSON.parse(u) : null;
@@ -27,6 +37,9 @@ $(document).ready(function () {
     const user = getUser();
     const authed = isAuthenticated();
 
+    const role = String(user?.role || '').toLowerCase();
+    const isAdmin = role === 'admin';
+
     const dashboardNav = document.getElementById('dashboardNav');
     const adminNav = document.getElementById('adminNav');
     const logoutNav = document.getElementById('logoutNav');
@@ -35,7 +48,7 @@ $(document).ready(function () {
       dashboardNav.style.display = authed ? '' : 'none';
     }
     if (adminNav) {
-      adminNav.style.display = (authed && user && user.role === 'admin') ? '' : 'none';
+      adminNav.style.display = (authed && isAdmin) ? '' : 'none';
     }
     if (logoutNav) {
       logoutNav.style.display = authed ? '' : 'none';
@@ -65,6 +78,107 @@ $(document).ready(function () {
     }, 50);
   }
 
+  // Initialize form validations when view is loaded
+  function initializeValidations(viewId) {
+    if (!$.fn.validate) return;
+
+    const validationConfig = {
+      errorElement: 'div',
+      errorClass: 'invalid-feedback',
+      highlight: function (element) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function (element) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      },
+      errorPlacement: function (error, element) {
+        if (element.closest('.input-group').length) {
+          error.insertAfter(element.closest('.input-group'));
+        } else {
+          error.insertAfter(element);
+        }
+      }
+    };
+
+    if (viewId === 'login') {
+      $('#loginForm').validate({
+        ...validationConfig,
+        rules: {
+          email: { required: true, email: true },
+          password: { required: true, minlength: 6 }
+        },
+        messages: {
+          email: { required: 'Email is required.', email: 'Please enter a valid email.' },
+          password: { required: 'Password is required.', minlength: 'Minimum 6 characters.' }
+        }
+      });
+    }
+
+    if (viewId === 'register') {
+      $('#registerForm').validate({
+        ...validationConfig,
+        rules: {
+          name: { required: true, minlength: 2 },
+          email: { required: true, email: true },
+          password: { required: true, minlength: 8, maxlength: 20 },
+          confirm_password: { required: true, equalTo: '#registerPassword' }
+        },
+        messages: {
+          name: { required: 'Name is required.', minlength: 'Minimum 2 characters.' },
+          email: { required: 'Email is required.', email: 'Please enter a valid email.' },
+          password: { required: 'Password is required.', minlength: 'Minimum 8 characters.', maxlength: 'Maximum 20 characters.' },
+          confirm_password: { required: 'Confirm password.', equalTo: 'Passwords do not match.' }
+        }
+      });
+    }
+
+    if (viewId === 'contact') {
+      $('#contactForm').validate({
+        ...validationConfig,
+        rules: {
+          name: { required: true, minlength: 2 },
+          email: { required: true, email: true },
+          subject: { required: true, minlength: 3 },
+          message: { required: true, minlength: 10 }
+        },
+        messages: {
+          name: 'Please enter your name (min 2 chars).',
+          email: { required: 'Email is required.', email: 'Please enter a valid email.' },
+          subject: 'Subject is required (min 3 chars).',
+          message: 'Message must be at least 10 characters.'
+        }
+      });
+    }
+
+    if (viewId === 'dashboard') {
+      $('#skillForm').validate({
+        ...validationConfig,
+        rules: {
+          name: { required: true, minlength: 2 },
+          proficiency: { required: true }
+        },
+        messages: {
+          name: 'Skill name is required.',
+          proficiency: 'Select proficiency.'
+        }
+      });
+
+      $('#projectForm').validate({
+        ...validationConfig,
+        rules: {
+          title: { required: true, minlength: 3 },
+          github_url: { url: true },
+          project_url: { url: true }
+        },
+        messages: {
+          title: 'Project title is required (min 3 chars).',
+          github_url: 'Please enter a valid URL.',
+          project_url: 'Please enter a valid URL.'
+        }
+      });
+    }
+  }
+
   function syncSpaUi() {
     const view = getCurrentView();
 
@@ -85,6 +199,9 @@ $(document).ready(function () {
     if (view === 'skills') {
       animateSkillBars();
     }
+
+    // Initialize validations after view is loaded
+    setTimeout(() => initializeValidations(view), 100);
   }
 
   const app = $.spapp({
@@ -119,7 +236,8 @@ $(document).ready(function () {
     load: 'admin.html',
     onCreate: function () {
       const user = getUser();
-      if (!isAuthenticated() || user?.role !== 'admin') {
+      const role = String(user?.role || '').toLowerCase();
+      if (!isAuthenticated() || role !== 'admin') {
         window.location.hash = '#home';
       }
     }
@@ -138,12 +256,21 @@ $(document).ready(function () {
   $(document).on('submit', '#loginForm', function (e) {
     e.preventDefault();
 
+    // Check if form is valid (jQuery Validation)
+    if ($.fn.validate && !$(this).valid()) return;
+
     const email = $('#loginEmail').val();
     const password = $('#loginPassword').val();
     const alertBox = $('#loginAlert');
 
+    // Block UI during request
+    if ($.blockUI) $.blockUI({ message: '<h3>Logging in...</h3>' });
+
     apiLogin(email, password).then(res => {
+      if ($.unblockUI) $.unblockUI();
+
       if (!res.success) {
+        if (window.toastr) toastr.error(res.message || 'Login failed');
         alertBox
           .removeClass('d-none alert-success')
           .addClass('alert alert-danger')
@@ -154,6 +281,7 @@ $(document).ready(function () {
       localStorage.setItem('token', res.token);
       localStorage.setItem('user', JSON.stringify(res.user));
 
+      if (window.toastr) toastr.success('Login successful!');
       alertBox
         .removeClass('d-none alert-danger')
         .addClass('alert alert-success')
@@ -162,12 +290,18 @@ $(document).ready(function () {
       setTimeout(() => {
         window.location.hash = '#dashboard';
       }, 800);
+    }).catch(err => {
+      if ($.unblockUI) $.unblockUI();
+      if (window.toastr) toastr.error('Login failed');
     });
   });
 
   // REGISTER
   $(document).on('submit', '#registerForm', function (e) {
     e.preventDefault();
+
+    // Check if form is valid (jQuery Validation)
+    if ($.fn.validate && !$(this).valid()) return;
 
     const name = $('#registerName').val();
     const email = $('#registerEmail').val();
@@ -176,6 +310,7 @@ $(document).ready(function () {
     const alertBox = $('#registerAlert');
 
     if (password !== confirm) {
+      if (window.toastr) toastr.error('Passwords do not match');
       alertBox
         .removeClass('d-none alert-success')
         .addClass('alert alert-danger')
@@ -185,8 +320,14 @@ $(document).ready(function () {
 
     const data = { name, email, password };
 
+    // Block UI during request
+    if ($.blockUI) $.blockUI({ message: '<h3>Registering...</h3>' });
+
     apiRegister(data).then(res => {
+      if ($.unblockUI) $.unblockUI();
+
       if (!res.success) {
+        if (window.toastr) toastr.error(res.message || 'Registration failed');
         alertBox
           .removeClass('d-none alert-success')
           .addClass('alert alert-danger')
@@ -194,6 +335,7 @@ $(document).ready(function () {
         return;
       }
 
+      if (window.toastr) toastr.success('Registration successful!');
       alertBox
         .removeClass('d-none alert-danger')
         .addClass('alert alert-success')
@@ -202,6 +344,9 @@ $(document).ready(function () {
       setTimeout(() => {
         window.location.hash = '#login';
       }, 800);
+    }).catch(err => {
+      if ($.unblockUI) $.unblockUI();
+      if (window.toastr) toastr.error('Registration failed');
     });
   });
 
@@ -209,6 +354,16 @@ $(document).ready(function () {
   $(document).on('click', '#logoutBtn', function () {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    if (window.toastr) toastr.info('Logged out successfully');
+    window.location.hash = '#home';
+  });
+
+  // NAV LOGOUT
+  $(document).on('click', '#navLogoutBtn', function (e) {
+    e.preventDefault();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    if (window.toastr) toastr.info('Logged out successfully');
     window.location.hash = '#home';
   });
 

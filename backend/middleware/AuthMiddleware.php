@@ -5,14 +5,16 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Flight;
 
+require_once __DIR__ . '/../config/Database.php';
+
 class AuthMiddleware {
 
     private string $secretKey;
     private string $algorithm = 'HS256';
 
     public function __construct() {
-        // Load secret key from config
-        $this->secretKey = $_ENV['JWT_SECRET'] ?? 'dev_secret_change_me';
+        // Load secret key from Database config (uses env variables)
+        $this->secretKey = \Database::JWT_SECRET();
     }
 
     // Generate JWT token
@@ -24,7 +26,7 @@ class AuthMiddleware {
             'iat' => $issuedAt,
             'exp' => $expire,
             'user_id' => $userId,
-            'role' => $role
+            'role' => strtolower(trim($role))
         ];
 
         return JWT::encode($payload, $this->secretKey, $this->algorithm);
@@ -58,7 +60,8 @@ class AuthMiddleware {
     public function requireAdmin(): void {
         $user = Flight::get('user');
 
-        if (!$user || !isset($user['role']) || $user['role'] !== 'admin') {
+        $role = is_array($user) && isset($user['role']) ? strtolower(trim((string)$user['role'])) : '';
+        if ($role !== 'admin') {
             Flight::jsonHalt(['error' => 'Forbidden'], 403);
         }
     }

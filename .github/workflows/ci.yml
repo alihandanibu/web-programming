@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  backend-php:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+
+      - name: Validate composer.json
+        working-directory: backend
+        run: composer validate --no-interaction
+
+      - name: Install dependencies
+        working-directory: backend
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: PHP syntax check (excluding vendor)
+        run: |
+          set -e
+          find backend -path backend/vendor -prune -o -name "*.php" -print0 | xargs -0 -n1 php -l

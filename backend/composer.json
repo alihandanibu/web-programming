@@ -1,4 +1,8 @@
 {
+    "name": "alihandanibu/web-programming-backend",
+    "description": "FlightPHP + MySQL REST API for Handan Portfolio (Web Programming project)",
+    "type": "project",
+    "license": "proprietary",
     "require": {
         "zircote/swagger-php": "^4.5",
         "mikecao/flight": "^3.17",

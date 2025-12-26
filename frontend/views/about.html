@@ -1,45 +1,91 @@
-<section class="section-padding">
-    <div class="container">
-        <h2 class="section-title">About Me</h2>
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="about-content">
-                    <h3 class="mb-4">Welcome to my portfolio</h3>
-                    <p class="mb-4">I'm <strong>Ali Handan</strong>, a second-year IT student at International Burch University. 
-                    I'm passionate about web development and technology, constantly seeking new challenges to improve my skills.</p>
-                    
-                    <div class="about-details">
-                        <div class="detail-item mb-3">
-                            <h5 class="section-subtitle">Education</h5>
-                            <p><strong>International Burch University</strong> — Bachelor of IT (2nd year)</p>
-                            <p><strong>Third High School Sarajevo</strong></p>
+<div class="container py-4 py-lg-5">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <div class="about-card p-4 p-lg-5">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="icon-badge" aria-hidden="true">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div>
+                        <h2 class="mb-0">About me</h2>
+                        <div class="text-muted">Second-year IT student · Sarajevo</div>
+                    </div>
+                </div>
+
+                <p class="lead mb-3">
+                    I'm <strong>Ali Handan</strong>, a second-year IT student at International Burch University.
+                    I enjoy building clean, responsive web apps and learning new tools through practical projects.
+                </p>
+                <p class="mb-4 text-muted">
+                    Lately I’m focused on strengthening my backend fundamentals (REST APIs, auth, databases) while keeping the UI simple and usable.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="about-mini-card p-3 h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fa-solid fa-graduation-cap text-muted" aria-hidden="true"></i>
+                                <div class="fw-semibold">Education</div>
+                            </div>
+                            <div class="small text-muted">
+                                International Burch University — Bachelor of IT (2nd year)
+                            </div>
+                            <div class="small text-muted mt-1">Third High School Sarajevo</div>
                         </div>
-                        
-                        <div class="detail-item mb-3">
-                            <h5 class="section-subtitle">Location</h5>
-                            <p>Sarajevo, Bosnia and Herzegovina</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="about-mini-card p-3 h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fa-solid fa-location-dot text-muted" aria-hidden="true"></i>
+                                <div class="fw-semibold">Location</div>
+                            </div>
+                            <div class="small text-muted">Sarajevo, Bosnia and Herzegovina</div>
                         </div>
-                        
-                        <div class="detail-item mb-3">
-                            <h5 class="section-subtitle">Interests</h5>
-                            <p>Web development, mobile applications, UI/UX design, photography</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="about-mini-card p-3 h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fa-solid fa-bolt text-muted" aria-hidden="true"></i>
+                                <div class="fw-semibold">Interests</div>
+                            </div>
+                            <div class="small text-muted">Web development, UI/UX, mobile apps, photography</div>
                         </div>
                     </div>
                 </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="#contact" class="btn btn-primary">
+                        <i class="fa-solid fa-envelope me-2" aria-hidden="true"></i>Contact
+                    </a>
+                    <a href="https://github.com/alihandanibu" class="btn btn-outline-dark" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github me-2" aria-hidden="true"></i>GitHub
+                    </a>
+                </div>
             </div>
-            <div class="col-lg-6">
-                <div class="about-image text-center">
-                    <div class="profile-placeholder p-5">
-                        <img src="./assets/images/ali-handan.jpeg" alt="Ali Handan" class="img-fluid rounded-circle mb-3" style="max-width:200px;">
-                        <h4>Ali Handan</h4>
-                        <p class="text-muted">IT Student</p>
-                        <div class="mt-2">
-                            <a href="https://github.com/alihandanibu" class="btn btn-outline-dark btn-sm me-2" target="_blank">GitHub</a>
-                            <a href="#contact" class="btn btn-primary btn-sm">Contact</a>
-                        </div>
-                    </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="about-profile p-4 text-center">
+                <img src="assets/images/ali-handan.jpeg" alt="Ali Handan" class="about-avatar mb-3">
+                <h4 class="mb-1">Ali Handan</h4>
+                <div class="text-muted mb-3">IT Student</div>
+
+                <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                    <span class="badge text-bg-light border">REST API</span>
+                    <span class="badge text-bg-light border">JWT</span>
+                    <span class="badge text-bg-light border">Bootstrap</span>
+                    <span class="badge text-bg-light border">MySQL</span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="https://github.com/alihandanibu" class="btn btn-outline-dark" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github me-2" aria-hidden="true"></i>View GitHub
+                    </a>
+                    <a href="#contact" class="btn btn-primary">
+                        <i class="fa-solid fa-paper-plane me-2" aria-hidden="true"></i>Send a message
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>

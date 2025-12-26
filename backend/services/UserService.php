@@ -111,10 +111,12 @@ class UserService {
             ];
         }
 
+        $role = strtolower(trim((string)($user['role'] ?? 'user')));
+
         // JWT with ROLE (Milestone 4 requirement)
         $token = $this->authMiddleware->generateToken(
             (int)$user['id'],
-            (string)$user['role']
+            $role
         );
 
         return [
@@ -125,7 +127,7 @@ class UserService {
                 'id' => (int)$user['id'],
                 'name' => $user['name'] ?? '',
                 'email' => $user['email'],
-                'role' => $user['role']
+                'role' => $role
             ]
         ];
     }
@@ -145,6 +147,10 @@ class UserService {
 
         unset($user['password']);
 
+        if (isset($user['role'])) {
+            $user['role'] = strtolower(trim((string)$user['role']));
+        }
+
         return [
             'success' => true,
             'user' => $user
@@ -159,6 +165,9 @@ class UserService {
 
         foreach ($users as &$user) {
             unset($user['password']);
+            if (isset($user['role'])) {
+                $user['role'] = strtolower(trim((string)$user['role']));
+            }
         }
 
         return [
