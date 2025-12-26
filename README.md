@@ -1,9 +1,9 @@
 # Handan Portfolio (Web Programming) — Milestone 5
 
 ## Live links
-- Frontend: TODO
-- Backend API: TODO
-- Swagger UI: TODO
+- Frontend: https://portfolio-handan.vercel.app
+- Backend API: https://handan-portfolio-zojo5.ondigitalocean.app
+- Swagger UI: https://handan-portfolio-zojo5.ondigitalocean.app/v1/docs
 
 ## Tech
 - Backend: PHP + FlightPHP + PDO + MySQL, firebase/php-jwt, swagger-php
