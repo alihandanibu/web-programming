@@ -5,8 +5,6 @@
 - Backend API: TODO
 - Swagger UI: TODO
 
-## Course requirements coverage (quick)
-
 ## Tech
 - Backend: PHP + FlightPHP + PDO + MySQL, firebase/php-jwt, swagger-php
 - Frontend: Bootstrap 5, SPAPP, jQuery (+ Validate), BlockUI, Toastr, Chart.js
