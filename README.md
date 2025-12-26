@@ -77,11 +77,6 @@ DB_HOST
 DB_PORT
 DB_NAME
 DB_USER
-DB_PASS
-
-No hardcoded credentials in the repository
-Compatible with hosting platforms such as DigitalOcean
-Supports separated frontend/backend deployment
-API base URL can be configured for production environments
+DB_PASSs
 -----------------------------------------------------------------
 Contact: ali.handan@stu.ibu.edu.ba
