@@ -1,6 +1,7 @@
 function computeApiBase() {
   // Deployment override (frontend and backend on different domains)
   const override =
+    (typeof window !== 'undefined' && (window.__ENV && (window.__ENV.API_URL || window.__ENV.VITE_API_URL))) ||
     (typeof window !== 'undefined' && (window.__API_BASE__ || window.API_BASE)) ||
     document.querySelector('meta[name="api-base"]')?.getAttribute('content');
 

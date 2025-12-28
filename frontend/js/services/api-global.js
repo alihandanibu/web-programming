@@ -5,6 +5,15 @@
  */
 
 function computeApiBase() {
+  // Prefer runtime-provided environment variable (Vercel)
+  const envBase =
+    (typeof window !== 'undefined' && window.__ENV && (window.__ENV.API_URL || window.__ENV.VITE_API_URL)) ||
+    null;
+
+  if (typeof envBase === 'string' && envBase.trim() !== '') {
+    return envBase.trim().replace(/\/+$/, '');
+  }
+
   // Check for deployment override via meta tag (DigitalOcean App Platform)
   const metaBase = document.querySelector('meta[name="api-base"]');
   if (metaBase && metaBase.content && metaBase.content.trim() !== '') {
