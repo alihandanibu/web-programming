@@ -3,6 +3,8 @@
 ## Live links
 - Frontend: [[https://portfolio-handan.vercel.app](https://portfolio-handan-68r3tvgnc-alihandanibus-projects.vercel.app/#home)](https://portfolio-handan.vercel.app/#home)
 - <img width="1716" height="967" alt="image" src="https://github.com/user-attachments/assets/8f9bd6af-c0e4-4cf6-8945-48821788d1a5" />
+<img width="1874" height="925" alt="image" src="https://github.com/user-attachments/assets/7ec0e438-e61f-48f5-a7c4-b4de9601323c" />
+
 - Backend API: [https://handan-portfolio-zojo5.ondigitalocean.app](https://handan-portfolio-zojo5.ondigitalocean.app/v1/openapi)
 - <img width="1545" height="736" alt="image" src="https://github.com/user-attachments/assets/8e9ede9c-4c17-46ef-acd3-8e2fe843b50b" />
 - Swagger UI: [https://handan-portfolio-zojo5.ondigitalocean.app/v1/docs](https://handan-portfolio-zojo5.ondigitalocean.app/v1/docs)
