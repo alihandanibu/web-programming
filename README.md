@@ -66,7 +66,6 @@ Admin-only routes protected with role checks
 Users cannot access admin functionality (backend enforced)
 
 ✔ Backend validation complements frontend validation
-✔ Defense-in-depth approach applied
 
 ## 4. Deployment Readiness
 
