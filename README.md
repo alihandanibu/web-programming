@@ -69,7 +69,6 @@ JWT token verification on protected routes
 Admin-only routes protected with role checks
 Users cannot access admin functionality (backend enforced)
 
-✔ Backend validation complements frontend validation
 
 ## 4. Deployment Readiness
 
