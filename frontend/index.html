@@ -7,9 +7,52 @@
 
   <meta name="api-base" content="https://handan-portfolio-zojo5.ondigitalocean.app" />
 
-  <script src="/api/env.js"></script>
+  <script>
+    // Compute a stable base path so relative assets (css/js/views) work
+    // even when the app is deployed under a subfolder (e.g. /.../frontend/).
+    (function () {
+      var path = (window.location && window.location.pathname) ? String(window.location.pathname) : '/';
+      var baseDir = '/';
 
-  <base href="/">
+      var idx = path.indexOf('/frontend/');
+      if (idx !== -1) {
+        baseDir = path.slice(0, idx + '/frontend/'.length);
+      } else if (path.endsWith('/frontend')) {
+        baseDir = path + '/';
+      }
+
+      var base = document.querySelector('base');
+      if (!base) {
+        base = document.createElement('base');
+        document.head.insertBefore(base, document.head.firstChild);
+      }
+      base.setAttribute('href', baseDir);
+
+      // Expose for later scripts
+      window.__APP_BASE__ = baseDir;
+    })();
+
+    // Try to load env injector from common locations.
+    (function () {
+      function loadScript(src) {
+        return new Promise(function (resolve) {
+          var s = document.createElement('script');
+          s.src = src;
+          s.async = false;
+          s.onload = resolve;
+          s.onerror = resolve;
+          document.head.appendChild(s);
+        });
+      }
+
+      // Prefer root function route; fallback to relative api/ for subfolder deployments.
+      loadScript('/api/env.js').then(function () {
+        if (!window.__ENV || !window.__ENV.API_URL) {
+          return loadScript('api/env.js');
+        }
+      });
+    })();
+  </script>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -78,21 +121,24 @@
 
 
   <script>
-  if (!location.hash) {
-    const viewFromPath = (location.pathname || '/')
-      .replace(/^\/+/, '')
-      .split('/')[0]
-      .trim();
+    if (!location.hash) {
+      var baseDir = window.__APP_BASE__ ? String(window.__APP_BASE__) : '/';
 
-    const allowed = new Set([
-      'home', 'about', 'projects', 'skills', 'contact',
-      'login', 'register', 'dashboard', 'admin', 'error_404'
-    ]);
+      var viewFromPath = (location.pathname || '/')
+        .replace(baseDir, '')
+        .replace(/^\/+/, '')
+        .split('/')[0]
+        .trim();
 
-    const target = (viewFromPath && allowed.has(viewFromPath)) ? viewFromPath : 'home';
-    location.replace('/#' + target);
-  }
-</script>
+      var allowed = new Set([
+        'home', 'about', 'projects', 'skills', 'contact',
+        'login', 'register', 'dashboard', 'admin', 'error_404'
+      ]);
+
+      var target = (viewFromPath && allowed.has(viewFromPath)) ? viewFromPath : 'home';
+      location.replace(baseDir + '#' + target);
+    }
+  </script>
 
 
   <!-- Core libs -->

@@ -21,6 +21,22 @@
       "destination": "/frontend/assets/$1"
     },
     {
+      "source": "/frontend/css/(.*)",
+      "destination": "/frontend/css/$1"
+    },
+    {
+      "source": "/frontend/js/(.*)",
+      "destination": "/frontend/js/$1"
+    },
+    {
+      "source": "/frontend/views/(.*)",
+      "destination": "/frontend/views/$1"
+    },
+    {
+      "source": "/frontend/assets/(.*)",
+      "destination": "/frontend/assets/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/index.html"
     }
