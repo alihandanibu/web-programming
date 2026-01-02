@@ -1,28 +1,42 @@
-<h3 class="card-title text-center mb-4">Register</h3>
+<section class="section-padding">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="card auth-card">
+        <div class="card-body">
+          <h3 class="card-title text-center mb-4">Register</h3>
 
-<div id="registerAlert" class="alert d-none"></div>
+          <div id="registerAlert" class="alert d-none"></div>
 
-<form id="registerForm">
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label class="form-label">Full Name</label>
-      <input type="text" class="form-control" id="registerName" name="name" required>
+          <form id="registerForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="registerName" name="name" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="registerEmail" name="email" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" name="password" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" id="registerConfirmPassword" name="confirm_password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+          </form>
+
+          <div class="text-center mt-3">
+            <a href="#login">Already have an account? Login</a>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6 mb-3">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-control" id="registerEmail" name="email" required>
-    </div>
   </div>
-
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input type="password" class="form-control" id="registerPassword" name="password" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Confirm Password</label>
-    <input type="password" class="form-control" id="registerConfirmPassword" name="confirm_password" required>
-  </div>
-
-  <button type="submit" class="btn btn-primary w-100">Register</button>
-</form>
+</section>
