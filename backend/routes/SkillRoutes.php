@@ -9,7 +9,10 @@ use OpenApi\Annotations as OA;
  *     summary="Get skills (owner or admin)",
  *     tags={"Skills"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer"))
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Response(response=200, description="List of skills"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::route('GET /users/@userId/skills', function ($userId) {
@@ -34,7 +37,11 @@ Flight::route('GET /users/@userId/skills', function ($userId) {
  *     summary="Add skill (owner or admin)",
  *     tags={"Skills"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer"))
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\Response(response=200, description="Created"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::post('/users/@userId/skills', function ($userId) {
@@ -61,7 +68,11 @@ Flight::post('/users/@userId/skills', function ($userId) {
  *     tags={"Skills"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\Parameter(name="skillId", in="path", required=true, @OA\Schema(type="integer"))
+ *     @OA\Parameter(name="skillId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\Response(response=200, description="Updated"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::put('/users/@userId/skills/@skillId', function ($userId, $skillId) {
@@ -88,7 +99,10 @@ Flight::put('/users/@userId/skills/@skillId', function ($userId, $skillId) {
  *     tags={"Skills"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\Parameter(name="skillId", in="path", required=true, @OA\Schema(type="integer"))
+ *     @OA\Parameter(name="skillId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Response(response=200, description="Deleted"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::delete('/users/@userId/skills/@skillId', function ($userId, $skillId) {

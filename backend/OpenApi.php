@@ -10,6 +10,11 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Server(
+ *   url="https://handan-portfolio-zojo5.ondigitalocean.app",
+ *   description="Production (DigitalOcean App Platform)"
+ * )
+ *
+ * @OA\Server(
  *   url="http://localhost/mojnoviprojekat/web-programming/backend",
  *   description="Apache/XAMPP (project path)"
  * )

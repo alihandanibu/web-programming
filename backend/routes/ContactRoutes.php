@@ -6,7 +6,9 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/contact",
  *     summary="Submit contact form (public)",
- *     tags={"Contact"}
+ *     tags={"Contact"},
+ *     @OA\Response(response=200, description="Submitted"),
+ *     @OA\Response(response=400, description="Validation error")
  * )
  */
 Flight::post('/contact', function () {
@@ -21,7 +23,10 @@ Flight::post('/contact', function () {
  *     path="/users/{userId}/contacts",
  *     summary="Get contacts (admin only). Optional ?status=unread|read|replied filter",
  *     tags={"Contact"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(response=200, description="List of contacts"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::route('GET /users/@userId/contacts', function ($userId) {
@@ -40,7 +45,10 @@ Flight::route('GET /users/@userId/contacts', function ($userId) {
  *     path="/users/{userId}/contacts/{contactId}/status",
  *     summary="Update contact status (admin only)",
  *     tags={"Contact"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(response=200, description="Updated"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::route('PATCH /users/@userId/contacts/@contactId/status', function ($userId, $contactId) {
@@ -61,7 +69,10 @@ Flight::route('PATCH /users/@userId/contacts/@contactId/status', function ($user
  *     path="/users/{userId}/contacts/{contactId}",
  *     summary="Delete contact (admin only)",
  *     tags={"Contact"},
- *     security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(response=200, description="Deleted"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::delete('/users/@userId/contacts/@contactId', function ($userId, $contactId) {

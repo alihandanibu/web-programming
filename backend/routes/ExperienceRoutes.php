@@ -8,7 +8,10 @@ use OpenApi\Annotations as OA;
  *     summary="Get experiences (owner or admin)",
  *     tags={"Experiences"},
  *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer"))
+ *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Response(response=200, description="List of experiences"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
  * )
  */
 Flight::route('GET /users/@userId/experiences', function ($userId) {
