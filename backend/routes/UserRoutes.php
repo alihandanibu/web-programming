@@ -103,8 +103,7 @@ Flight::route('GET /users/@id', function ($id) {
  *             @OA\Property(property="name", type="string"),
  *             @OA\Property(property="email", type="string", format="email"),
  *             @OA\Property(property="password", type="string", format="password"),
- *             @OA\Property(property="bio", type="string"),
- *             @OA\Property(property="location", type="string")
+ *             @OA\Property(property="role", type="string", enum={"admin","user"}, description="Admin-only")
  *         )
  *     ),
  *     @OA\Response(

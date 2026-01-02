@@ -13,9 +13,7 @@ use OpenApi\Annotations as OA;
  *             required={"name","email","password"},
  *             @OA\Property(property="name", type="string", example="John Doe"),
  *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
- *             @OA\Property(property="password", type="string", format="password", example="password123"),
- *             @OA\Property(property="bio", type="string", example="Software developer"),
- *             @OA\Property(property="location", type="string", example="Sarajevo")
+ *             @OA\Property(property="password", type="string", format="password", example="password123")
  *         )
  *     ),
  *     @OA\Response(

@@ -46,14 +46,6 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "password123"
-                                    },
-                                    "bio": {
-                                        "type": "string",
-                                        "example": "Software developer"
-                                    },
-                                    "location": {
-                                        "type": "string",
-                                        "example": "Sarajevo"
                                     }
                                 },
                                 "type": "object"
@@ -1208,11 +1200,13 @@
                                         "type": "string",
                                         "format": "password"
                                     },
-                                    "bio": {
-                                        "type": "string"
-                                    },
-                                    "location": {
-                                        "type": "string"
+                                    "role": {
+                                        "description": "Admin-only",
+                                        "type": "string",
+                                        "enum": [
+                                            "admin",
+                                            "user"
+                                        ]
                                     }
                                 },
                                 "type": "object"
