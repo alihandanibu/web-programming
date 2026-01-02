@@ -40,14 +40,13 @@ For API reference and testing, use Swagger UI:
 ## Screenshots
 
 ### Frontend
-<img width="1716" height="967" alt="Frontend screenshot 1" src="https://github.com/user-attachments/assets/8f9bd6af-c0e4-4cf6-8945-48821788d1a5" />
+<img width="1743" height="971" alt="Frontend 1 ss" src="https://github.com/user-attachments/assets/817f9e74-4655-492c-87f4-edaec2634e09" />
 
 <img width="1874" height="925" alt="Frontend screenshot 2" src="https://github.com/user-attachments/assets/7ec0e438-e61f-48f5-a7c4-b4de9601323c" />
 
 ### Backend
-<img width="1545" height="736" alt="OpenAPI screenshot" src="https://github.com/user-attachments/assets/8e9ede9c-4c17-46ef-acd3-8e2fe843b50b" />
-
-<img width="1184" height="626" alt="Swagger UI screenshot" src="https://github.com/user-attachments/assets/497005c4-ce51-4b17-841c-9796048006ed" />
+<img width="579" height="171" alt="image" src="https://github.com/user-attachments/assets/9ecc28b1-fff3-4057-abbe-4363b5e9dcc4" />
+<img width="1831" height="910" alt="Swager" src="https://github.com/user-attachments/assets/d4e5bd13-e35c-4fcf-9977-d5b094424ca4" />
 
 
 ## Tech
