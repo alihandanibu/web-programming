@@ -99,7 +99,7 @@ Swagger UI  `http://localhost/mojnoviprojekat/web-programming/backend/public/v1/
 - **User**: Cannot access `GET /users` (returns 403)
 - **Owner**: Can only access their own `/users/{id}/*` endpoints
 - **Non-owner**: Gets 403 when accessing another user's data
-- 
+
 ### Frontend Tests (Browser)
 
 1. Open `http://localhost/mojnoviprojekat/web-programming/frontend/`
