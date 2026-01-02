@@ -185,6 +185,40 @@
                     "Contact"
                 ],
                 "summary": "Submit contact form (public)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "example": "Project inquiry"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Hi, I'd like to discuss a project..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Submitted"
@@ -201,6 +235,31 @@
                     "Contact"
                 ],
                 "summary": "Get contacts (admin only). Optional ?status=unread|read|replied filter",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User ID (kept for route compatibility; contacts are global)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Optional status filter",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "unread",
+                                "read",
+                                "replied"
+                            ]
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of contacts"
@@ -225,6 +284,50 @@
                     "Contact"
                 ],
                 "summary": "Update contact status (admin only)",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User ID (kept for route compatibility; contacts are global)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "contactId",
+                        "in": "path",
+                        "description": "Contact ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "unread",
+                                            "read",
+                                            "replied"
+                                        ],
+                                        "example": "read"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Updated"
@@ -249,6 +352,26 @@
                     "Contact"
                 ],
                 "summary": "Delete contact (admin only)",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User ID (kept for route compatibility; contacts are global)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "contactId",
+                        "in": "path",
+                        "description": "Contact ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Deleted"
@@ -319,7 +442,44 @@
                     "required": true,
                     "content": {
                         "application/json": {
-                            "schema": {}
+                            "schema": {
+                                "required": [
+                                    "company",
+                                    "position",
+                                    "start_date"
+                                ],
+                                "properties": {
+                                    "company": {
+                                        "type": "string",
+                                        "example": "Tech Company A"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "example": "Full Stack Developer"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-01"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-12-31",
+                                        "nullable": true
+                                    },
+                                    "current_job": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Worked on backend APIs...",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
                 },
@@ -366,7 +526,39 @@
                     "required": true,
                     "content": {
                         "application/json": {
-                            "schema": {}
+                            "schema": {
+                                "properties": {
+                                    "company": {
+                                        "type": "string",
+                                        "example": "Tech Company A"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "example": "Senior Developer"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-01"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-12-31",
+                                        "nullable": true
+                                    },
+                                    "current_job": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Led development team...",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
                 },
@@ -467,6 +659,55 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "E-commerce Website"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Full-stack e-commerce platform...",
+                                        "nullable": true
+                                    },
+                                    "technologies": {
+                                        "type": "string",
+                                        "example": "PHP,MySQL,JavaScript",
+                                        "nullable": true
+                                    },
+                                    "image_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/image.png",
+                                        "nullable": true
+                                    },
+                                    "project_url": {
+                                        "type": "string",
+                                        "example": "https://example.com",
+                                        "nullable": true
+                                    },
+                                    "link": {
+                                        "description": "Alias for project_url",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "github_url": {
+                                        "type": "string",
+                                        "example": "https://github.com/user/repo",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Project added"
@@ -506,6 +747,52 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "E-commerce Website"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated description",
+                                        "nullable": true
+                                    },
+                                    "technologies": {
+                                        "type": "string",
+                                        "example": "PHP,MySQL",
+                                        "nullable": true
+                                    },
+                                    "image_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/image.png",
+                                        "nullable": true
+                                    },
+                                    "project_url": {
+                                        "type": "string",
+                                        "example": "https://example.com",
+                                        "nullable": true
+                                    },
+                                    "link": {
+                                        "description": "Alias for project_url",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "github_url": {
+                                        "type": "string",
+                                        "example": "https://github.com/user/repo",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Updated"
@@ -610,7 +897,43 @@
                     "required": true,
                     "content": {
                         "application/json": {
-                            "schema": {}
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "proficiency"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "PHP"
+                                    },
+                                    "proficiency": {
+                                        "type": "string",
+                                        "enum": [
+                                            "beginner",
+                                            "intermediate",
+                                            "advanced",
+                                            "expert"
+                                        ],
+                                        "example": "advanced"
+                                    },
+                                    "level": {
+                                        "description": "Alias for proficiency",
+                                        "type": "string",
+                                        "enum": [
+                                            "beginner",
+                                            "intermediate",
+                                            "advanced",
+                                            "expert"
+                                        ]
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "Backend"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
                 },
@@ -660,7 +983,39 @@
                     "required": true,
                     "content": {
                         "application/json": {
-                            "schema": {}
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "PHP"
+                                    },
+                                    "proficiency": {
+                                        "type": "string",
+                                        "enum": [
+                                            "beginner",
+                                            "intermediate",
+                                            "advanced",
+                                            "expert"
+                                        ],
+                                        "example": "expert"
+                                    },
+                                    "level": {
+                                        "description": "Alias for proficiency",
+                                        "type": "string",
+                                        "enum": [
+                                            "beginner",
+                                            "intermediate",
+                                            "advanced",
+                                            "expert"
+                                        ]
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "Backend"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
                 },

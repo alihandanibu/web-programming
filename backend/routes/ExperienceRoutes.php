@@ -36,7 +36,19 @@ Flight::route('GET /users/@userId/experiences', function ($userId) {
  *     tags={"Experiences"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             required={"company","position","start_date"},
+ *             @OA\Property(property="company", type="string", example="Tech Company A"),
+ *             @OA\Property(property="position", type="string", example="Full Stack Developer"),
+ *             @OA\Property(property="start_date", type="string", format="date", example="2024-01-01"),
+ *             @OA\Property(property="end_date", type="string", format="date", nullable=true, example="2024-12-31"),
+ *             @OA\Property(property="current_job", type="boolean", example=false),
+ *             @OA\Property(property="description", type="string", nullable=true, example="Worked on backend APIs...")
+ *         )
+ *     ),
  *     @OA\Response(response=200, description="Created"),
  *     @OA\Response(response=403, description="Forbidden")
  * )
@@ -65,7 +77,18 @@ Flight::post('/users/@userId/experiences', function ($userId) {
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Parameter(name="experienceId", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="company", type="string", example="Tech Company A"),
+ *             @OA\Property(property="position", type="string", example="Senior Developer"),
+ *             @OA\Property(property="start_date", type="string", format="date", example="2024-01-01"),
+ *             @OA\Property(property="end_date", type="string", format="date", nullable=true, example="2024-12-31"),
+ *             @OA\Property(property="current_job", type="boolean", example=true),
+ *             @OA\Property(property="description", type="string", nullable=true, example="Led development team...")
+ *         )
+ *     ),
  *     @OA\Response(response=200, description="Updated"),
  *     @OA\Response(response=403, description="Forbidden")
  * )

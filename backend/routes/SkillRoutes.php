@@ -38,7 +38,17 @@ Flight::route('GET /users/@userId/skills', function ($userId) {
  *     tags={"Skills"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             required={"name","proficiency"},
+ *             @OA\Property(property="name", type="string", example="PHP"),
+ *             @OA\Property(property="proficiency", type="string", enum={"beginner","intermediate","advanced","expert"}, example="advanced"),
+ *             @OA\Property(property="level", type="string", enum={"beginner","intermediate","advanced","expert"}, description="Alias for proficiency"),
+ *             @OA\Property(property="category", type="string", example="Backend")
+ *         )
+ *     ),
  *     @OA\Response(response=200, description="Created"),
  *     @OA\Response(response=401, description="Unauthorized"),
  *     @OA\Response(response=403, description="Forbidden")
@@ -69,7 +79,16 @@ Flight::post('/users/@userId/skills', function ($userId) {
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Parameter(name="skillId", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\RequestBody(required=true, @OA\JsonContent()),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="name", type="string", example="PHP"),
+ *             @OA\Property(property="proficiency", type="string", enum={"beginner","intermediate","advanced","expert"}, example="expert"),
+ *             @OA\Property(property="level", type="string", enum={"beginner","intermediate","advanced","expert"}, description="Alias for proficiency"),
+ *             @OA\Property(property="category", type="string", example="Backend")
+ *         )
+ *     ),
  *     @OA\Response(response=200, description="Updated"),
  *     @OA\Response(response=401, description="Unauthorized"),
  *     @OA\Response(response=403, description="Forbidden")

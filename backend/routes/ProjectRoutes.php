@@ -42,6 +42,20 @@ Flight::route('GET /users/@userId/projects', function ($userId) {
  *     tags={"Projects"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             required={"title"},
+ *             @OA\Property(property="title", type="string", example="E-commerce Website"),
+ *             @OA\Property(property="description", type="string", nullable=true, example="Full-stack e-commerce platform..."),
+ *             @OA\Property(property="technologies", type="string", nullable=true, example="PHP,MySQL,JavaScript"),
+ *             @OA\Property(property="image_url", type="string", nullable=true, example="https://example.com/image.png"),
+ *             @OA\Property(property="project_url", type="string", nullable=true, example="https://example.com"),
+ *             @OA\Property(property="link", type="string", nullable=true, description="Alias for project_url"),
+ *             @OA\Property(property="github_url", type="string", nullable=true, example="https://github.com/user/repo")
+ *         )
+ *     ),
  *     @OA\Response(response=200, description="Project added"),
  *     @OA\Response(response=403, description="Forbidden")
  * )
@@ -71,6 +85,19 @@ Flight::post('/users/@userId/projects', function ($userId) {
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Parameter(name="projectId", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="title", type="string", example="E-commerce Website"),
+ *             @OA\Property(property="description", type="string", nullable=true, example="Updated description"),
+ *             @OA\Property(property="technologies", type="string", nullable=true, example="PHP,MySQL"),
+ *             @OA\Property(property="image_url", type="string", nullable=true, example="https://example.com/image.png"),
+ *             @OA\Property(property="project_url", type="string", nullable=true, example="https://example.com"),
+ *             @OA\Property(property="link", type="string", nullable=true, description="Alias for project_url"),
+ *             @OA\Property(property="github_url", type="string", nullable=true, example="https://github.com/user/repo")
+ *         )
+ *     ),
  *     @OA\Response(response=200, description="Updated"),
  *     @OA\Response(response=403, description="Forbidden")
  * )
