@@ -1,7 +1,7 @@
 # Handan Portfolio (Web Programming) — Milestone 5
 
 ## Live links
-- Frontend: https://portfolio-handan.vercel.app/#home
+- Frontend: [https://portfolio-handan.vercel.app/#home](https://portfolio-handan-hdtgsughz-alihandanibus-projects.vercel.app/#home)
 - Backend OpenAPI: https://handan-portfolio-zojo5.ondigitalocean.app/v1/openapi
 - Swagger UI: https://handan-portfolio-zojo5.ondigitalocean.app/v1/docs
 
