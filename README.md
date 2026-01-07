@@ -9,7 +9,7 @@
 
 Open the app via the Vercel link:
 
-- https://portfolio-handan.vercel.app/#home
+-  [https://portfolio-handan.vercel.app/#home](https://portfolio-handan-hdtgsughz-alihandanibus-projects.vercel.app/#home)
 
 ### What each page is for
 
